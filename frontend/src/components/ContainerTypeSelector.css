@@ -1,0 +1,27 @@
+.container-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.container-info {
+  font-weight: bold;
+}
+
+.container-details {
+  font-size: 0.875rem;
+  color: #6c757d;
+}
+
+.suitability-badge {
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-size: 0.75rem;
+  color: white;
+}
+
+.error-message {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
