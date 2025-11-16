@@ -9,7 +9,6 @@ on:
 env:
   JAVA_VERSION: "17"
   NODE_VERSION: "18"
-  AWS_REGION: "us-east-1"
 
 jobs:
   # ============================================
@@ -103,7 +102,7 @@ jobs:
         with:
           aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
       - name: Copy JAR to S3 (staging)
         run: |
