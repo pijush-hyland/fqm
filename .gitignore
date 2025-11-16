@@ -214,4 +214,4 @@ local.properties
 .scala_dependencies
 .worksheet
 
-application.env.template
+infrastructure/application.env
