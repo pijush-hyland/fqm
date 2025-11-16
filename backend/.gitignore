@@ -1,0 +1,36 @@
+# Environment files - DO NOT COMMIT
+.env
+.env.local
+.env.dev
+.env.prod
+
+# Sensitive configuration files
+application-local.properties.secret
+application-dev.properties.secret
+application-prod.properties.secret
+
+# IDE files
+.idea/
+.vscode/
+*.iml
+*.ipr
+*.iws
+
+# Build files
+target/
+build/
+out/
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Backup files
+*.bak
+*.swp
+*.swo
+*~

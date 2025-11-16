@@ -15,8 +15,6 @@ export const env = {
   
   // Environment Info
   NODE_ENV: import.meta.env.MODE,
-  DEV: import.meta.env.DEV,
-  PROD: import.meta.env.PROD,
 } as const;
 
 // Type for environment variables
