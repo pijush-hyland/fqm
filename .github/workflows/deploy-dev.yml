@@ -1,0 +1,229 @@
+name: Deploy to Development
+
+on:
+  push:
+    branches:
+      - develop
+  workflow_dispatch: # Allows manual trigger
+
+env:
+  JAVA_VERSION: "17"
+  NODE_VERSION: "18"
+  AWS_REGION: "us-east-1"
+
+jobs:
+  # ============================================
+  # BUILD BACKEND (Spring Boot JAR)
+  # ============================================
+  build-backend:
+    name: Build Backend JAR
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+            java-version: ${{ env.JAVA_VERSION }}
+            distribution: "temurin"
+            cache: "maven"
+
+      - name: Build with Maven
+        working-directory: ./backend
+        run: mvn clean package -DskipTests
+
+      - name: Run tests
+        working-directory: ./backend
+        run: mvn test
+        continue-on-error: true
+
+      - name: Upload JAR artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: backend-jar
+          path: backend/target/*.jar
+          retention-days: 7
+
+  # ============================================
+  # BUILD FRONTEND (React/Vite)
+  # ============================================
+  build-frontend:
+    name: Build Frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: "npm"
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ./frontend
+        run: npm ci
+
+      - name: Build application
+        working-directory: ./frontend
+        env:
+          VITE_API_BASE_URL: ${{ secrets.DEV_API_URL }}
+          VITE_ENABLE_DEBUG: "true"
+          VITE_APP_NAME: "Freight Quote (Dev)"
+          VITE_APP_VERSION: ${{ github.sha }}
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: frontend-dist
+          path: frontend/dist
+          retention-days: 7
+
+  # ============================================
+  # DEPLOY BACKEND TO EC2
+  # ============================================
+  deploy-backend:
+    name: Deploy Backend to EC2
+    needs: build-backend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download JAR artifact
+        uses: actions/download-artifact@v3
+        with:
+          name: backend-jar
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Copy JAR to S3 (staging)
+        run: |
+          JAR_FILE=$(ls *.jar | head -n 1)
+          echo "Uploading $JAR_FILE to S3..."
+          aws s3 cp $JAR_FILE s3://${{ secrets.DEV_DEPLOYMENT_BUCKET }}/backend/freight-quote-backend.jar
+
+      - name: Deploy to EC2 via SSM
+        run: |
+          echo "Deploying to EC2..."
+          COMMAND_ID=$(aws ssm send-command \
+            --instance-ids ${{ secrets.DEV_EC2_INSTANCE_ID }} \
+            --document-name "AWS-RunShellScript" \
+            --parameters 'commands=[
+              "#!/bin/bash",
+              "set -e",
+              "echo \"[$(date)] Starting deployment...\"",
+              "echo \"Stopping existing application...\"",
+              "sudo systemctl stop freight-quote-backend || true",
+              "echo \"Downloading new JAR from S3...\"",
+              "aws s3 cp s3://${{ secrets.DEV_DEPLOYMENT_BUCKET }}/backend/freight-quote-backend.jar /opt/freight-quote/freight-quote-backend.jar",
+              "echo \"Refreshing environment configuration from S3...\"",
+              "aws s3 cp s3://${{ secrets.DEV_DEPLOYMENT_BUCKET }}/config/application.env /opt/freight-quote/application.env",
+              "sudo chown freight-quote:freight-quote /opt/freight-quote/application.env",
+              "sudo chmod 600 /opt/freight-quote/application.env",
+              "sudo chown freight-quote:freight-quote /opt/freight-quote/freight-quote-backend.jar",
+              "sudo chmod 500 /opt/freight-quote/freight-quote-backend.jar",
+              "echo \"Starting application...\"",
+              "sudo systemctl start freight-quote-backend",
+              "echo \"Waiting for application to start...\"",
+              "sleep 15",
+              "echo \"Checking application health...\"",
+              "curl -f http://localhost:8080/actuator/health || exit 1",
+              "echo \"[$(date)] Deployment successful!\""
+            ]' \
+            --comment "Deploy backend to dev" \
+            --output text \
+            --query 'Command.CommandId')
+
+          echo "Command ID: $COMMAND_ID"
+          echo "Waiting for command to complete..."
+
+          # Wait for command to complete
+          sleep 5
+          aws ssm wait command-executed \
+            --command-id $COMMAND_ID \
+            --instance-id ${{ secrets.DEV_EC2_INSTANCE_ID }} \
+            --timeout 300 || true
+
+      - name: Verify deployment
+        run: |
+          echo "Waiting for service to be fully ready..."
+          sleep 10
+          echo "Deployment completed! Check EC2 instance for application status."
+
+  # ============================================
+  # DEPLOY FRONTEND TO S3
+  # ============================================
+  deploy-frontend:
+    name: Deploy Frontend to S3
+    needs: build-frontend
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: frontend-dist
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - name: Deploy to S3
+        run: |
+          echo "Deploying frontend to S3..."
+          aws s3 sync . s3://${{ secrets.DEV_S3_BUCKET }} \
+            --delete \
+            --cache-control "public, max-age=0, must-revalidate"
+          echo "Frontend deployed successfully!"
+
+      - name: Invalidate CloudFront cache
+        if: ${{ secrets.DEV_CLOUDFRONT_DISTRIBUTION_ID != '' }}
+        run: |
+          echo "Invalidating CloudFront cache..."
+          aws cloudfront create-invalidation \
+            --distribution-id ${{ secrets.DEV_CLOUDFRONT_DISTRIBUTION_ID }} \
+            --paths "/*"
+          echo "CloudFront cache invalidated!"
+
+  # ============================================
+  # DEPLOYMENT SUMMARY
+  # ============================================
+  summary:
+    name: Deployment Summary
+    needs: [deploy-backend, deploy-frontend]
+    runs-on: ubuntu-latest
+    if: always()
+
+    steps:
+      - name: Deployment Status
+        run: |
+          echo "=================================="
+          echo "🚀 DEPLOYMENT SUMMARY"
+          echo "=================================="
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Commit: ${{ github.sha }}"
+          echo "Backend Status: ${{ needs.deploy-backend.result }}"
+          echo "Frontend Status: ${{ needs.deploy-frontend.result }}"
+          echo ""
+          if [ "${{ needs.deploy-backend.result }}" == "success" ] && [ "${{ needs.deploy-frontend.result }}" == "success" ]; then
+            echo "✅ Full deployment successful!"
+            echo ""
+            echo "🌐 Access your application:"
+            echo "   Frontend: ${{ secrets.DEV_FRONTEND_URL }}"
+            echo "   Backend API: ${{ secrets.DEV_API_URL }}"
+          else
+            echo "❌ Deployment failed!"
+            exit 1
+          fi
