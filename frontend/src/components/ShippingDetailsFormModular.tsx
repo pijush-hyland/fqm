@@ -38,17 +38,17 @@ const ShippingDetailsFormModular: React.FC<StepComponentProps<QuoteFormData>> = 
 		onInputChange('shippingDate', value);
 	};
 
-	const handleMaxTransitDaysChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-		const value = e.target.value;
-		if (value === '') {
-			onInputChange('maxTransitDays', '');
-		} else {
-			const numValue = parseInt(value, 10);
-			if (!isNaN(numValue) && numValue >= 0) {
-				onInputChange('maxTransitDays', numValue);
-			}
-		}
-	};
+	// const handleMaxTransitDaysChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+	// 	const value = e.target.value;
+	// 	if (value === '') {
+	// 		onInputChange('maxTransitDays', '');
+	// 	} else {
+	// 		const numValue = parseInt(value, 10);
+	// 		if (!isNaN(numValue) && numValue >= 0) {
+	// 			onInputChange('maxTransitDays', numValue);
+	// 		}
+	// 	}
+	// };
 
 	return (
 		<div className='mb-6'>

@@ -28,9 +28,9 @@ const ContainerDetailsFormModular: React.FC<StepComponentProps<QuoteFormData>> =
 		}
 	};
 
-	const handleContainerCountChange = (containerTypeId: string, count: number) => {
+	const handleContainerCountChange = (containerTypeId: string | number, count: number) => {
 		const newContainerCount = { ...formData.containerCount };
-		const numericId = parseInt(containerTypeId, 10);
+		const numericId = typeof containerTypeId === 'string' ? parseInt(containerTypeId, 10) : containerTypeId;
 		
 		if (count === 0) {
 			delete newContainerCount[numericId];
@@ -47,12 +47,12 @@ const ContainerDetailsFormModular: React.FC<StepComponentProps<QuoteFormData>> =
 
 	const getSelectedContainerInfo = () => {
 		const selected = containerTypes.filter(type => {
-			const numericId = parseInt(type.id, 10);
+			const numericId = typeof type.id === 'string' ? parseInt(type.id, 10) : type.id;
 			return formData.containerCount[numericId] && formData.containerCount[numericId] > 0;
 		});
 		
 		return selected.map(type => {
-			const numericId = parseInt(type.id, 10);
+			const numericId = typeof type.id === 'string' ? parseInt(type.id, 10) : type.id;
 			return {
 				...type,
 				count: formData.containerCount[numericId]
@@ -100,7 +100,7 @@ const ContainerDetailsFormModular: React.FC<StepComponentProps<QuoteFormData>> =
 								<button
 									type="button"
 									onClick={() => {
-										const numericId = parseInt(containerType.id, 10);
+										const numericId = typeof containerType.id === 'string' ? parseInt(containerType.id, 10) : containerType.id;
 										handleContainerCountChange(
 											containerType.id, 
 											Math.max(0, (formData.containerCount[numericId] || 0) - 1)
@@ -116,7 +116,7 @@ const ContainerDetailsFormModular: React.FC<StepComponentProps<QuoteFormData>> =
 									min="0"
 									max="99"
 									value={(() => {
-										const numericId = parseInt(containerType.id, 10);
+										const numericId = typeof containerType.id === 'string' ? parseInt(containerType.id, 10) : containerType.id;
 										return formData.containerCount[numericId] || 0;
 									})()}
 									onChange={(e) => {
@@ -130,9 +130,9 @@ const ContainerDetailsFormModular: React.FC<StepComponentProps<QuoteFormData>> =
 								<button
 									type="button"
 									onClick={() => {
-										const numericId = parseInt(containerType.id, 10);
+										const numericId = typeof containerType.id === 'string' ? parseInt(containerType.id, 10) : containerType.id;
 										handleContainerCountChange(
-											containerType.id, 
+											containerType.id,
 											(formData.containerCount[numericId] || 0) + 1
 										);
 									}}

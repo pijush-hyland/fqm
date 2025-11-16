@@ -1,4 +1,3 @@
-import type { ContainerType } from "./container.type";
 import type { Location } from "./location.type";
 
 export type courierRate = {
