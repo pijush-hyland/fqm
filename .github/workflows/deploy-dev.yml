@@ -189,11 +189,13 @@ jobs:
           echo "Frontend deployed successfully!"
 
       - name: Invalidate CloudFront cache
-        if: ${{ secrets.DEV_CLOUDFRONT_DISTRIBUTION_ID != '' }}
+        if: ${{ env.DEV_CLOUDFRONT_DISTRIBUTION_ID != '' }}
+        env:
+          DEV_CLOUDFRONT_DISTRIBUTION_ID: ${{ secrets.DEV_CLOUDFRONT_DISTRIBUTION_ID }}
         run: |
           echo "Invalidating CloudFront cache..."
           aws cloudfront create-invalidation \
-            --distribution-id ${{ secrets.DEV_CLOUDFRONT_DISTRIBUTION_ID }} \
+            --distribution-id $DEV_CLOUDFRONT_DISTRIBUTION_ID \
             --paths "/*"
           echo "CloudFront cache invalidated!"
 
