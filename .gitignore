@@ -119,10 +119,6 @@ temp/
 *.sqlite
 *.sqlite3
 
-# Application specific
-application-local.properties
-application-dev.properties
-application-prod.properties
 
 # Security and sensitive files
 *.key
