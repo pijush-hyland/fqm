@@ -67,6 +67,24 @@ jobs:
         working-directory: ./frontend
         run: npm ci
 
+      - name: Debug - Print environment variables
+        working-directory: ./frontend
+        env:
+          VITE_API_BASE_URL: ${{ secrets.DEV_API_URL }}
+          VITE_ENABLE_DEBUG: "true"
+          VITE_APP_NAME: "Freight Quote (Dev)"
+          VITE_APP_VERSION: ${{ github.sha }}
+        run: |
+          echo "=========================================="
+          echo "Environment Variables for Frontend Build"
+          echo "=========================================="
+          echo "VITE_API_BASE_URL: $VITE_API_BASE_URL"
+          echo "VITE_ENABLE_DEBUG: $VITE_ENABLE_DEBUG"
+          echo "VITE_APP_NAME: $VITE_APP_NAME"
+          echo "VITE_APP_VERSION: $VITE_APP_VERSION"
+          echo "NODE_ENV: $NODE_ENV"
+          echo "=========================================="
+
       - name: Build application
         working-directory: ./frontend
         env:
@@ -74,7 +92,7 @@ jobs:
           VITE_ENABLE_DEBUG: "true"
           VITE_APP_NAME: "Freight Quote (Dev)"
           VITE_APP_VERSION: ${{ github.sha }}
-        run: npm run build
+        run: npm run build -- --logLevel info
 
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
