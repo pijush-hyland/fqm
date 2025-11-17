@@ -65,8 +65,8 @@ WorkingDirectory=/opt/freight-quote
 # Load environment variables from file
 EnvironmentFile=/opt/freight-quote/application.env
 
-# Start command
-ExecStart=/usr/bin/java $JAVA_OPTS -jar /opt/freight-quote/freight-quote-backend.jar
+# Start command (explicitly pass Spring profile as JVM property)
+ExecStart=/bin/sh -c 'exec /usr/bin/java ${JAVA_OPTS} -Dspring.profiles.active=${SPRING_PROFILES_ACTIVE} -Dspring.datasource.url=${DB_URL} -Dspring.datasource.username=${DB_USERNAME} -Dspring.datasource.password=${DB_PASSWORD} -Dcors.allowed-origins=${CORS_ALLOWED_ORIGINS} -Dserver.port=${SERVER_PORT} -jar /opt/freight-quote/freight-quote-backend.jar'
 
 # Restart policy
 Restart=always
