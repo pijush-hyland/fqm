@@ -128,6 +128,43 @@ jobs:
           echo "Uploading $JAR_FILE to S3..."
           aws s3 cp $JAR_FILE s3://${{ secrets.DEV_DEPLOYMENT_BUCKET }}/backend/freight-quote-backend.jar
 
+      - name: Validate Instance Status
+        run: |
+          INSTANCE_ID="${{ secrets.DEV_EC2_INSTANCE_ID }}"
+          echo "Validating instance: $INSTANCE_ID"
+          
+          # Check EC2 State
+          STATE=$(aws ec2 describe-instances \
+            --instance-ids "$INSTANCE_ID" \
+            --query "Reservations[0].Instances[0].State.Name" \
+            --output text 2>/dev/null || echo "NotFound")
+            
+          echo "Instance State: $STATE"
+          
+          if [ "$STATE" == "NotFound" ]; then
+            echo "::error::Instance ID $INSTANCE_ID not found in this region."
+            exit 1
+          fi
+          
+          if [ "$STATE" != "running" ]; then
+            echo "::error::Instance is in state '$STATE', but must be 'running' for SSM deployment."
+            exit 1
+          fi
+          
+          # Check SSM Connection
+          SSM_STATUS=$(aws ssm describe-instance-information \
+            --filters "Key=InstanceIds,Values=$INSTANCE_ID" \
+            --query "InstanceInformationList[0].PingStatus" \
+            --output text)
+            
+          echo "SSM Agent Status: $SSM_STATUS"
+          
+          if [ "$SSM_STATUS" != "Online" ]; then
+            echo "::error::Instance is running but SSM Agent is not Online (Status: $SSM_STATUS). Check IAM role and SSM Agent service."
+            exit 1
+          fi
+          echo "Instance is ready for deployment."
+
       - name: Deploy to EC2 via SSM
         run: |
           echo "Deploying to EC2..."
