@@ -171,28 +171,7 @@ jobs:
           COMMAND_ID=$(aws ssm send-command \
             --instance-ids ${{ secrets.DEV_EC2_INSTANCE_ID }} \
             --document-name "AWS-RunShellScript" \
-            --parameters 'commands=[
-              "#!/bin/bash",
-              "set -e",
-              "echo \"[$(date)] Starting deployment...\"",
-              "echo \"Stopping existing application...\"",
-              "sudo systemctl stop freight-quote-backend || true",
-              "echo \"Downloading new JAR from S3...\"",
-              "aws s3 cp s3://${{ secrets.DEV_DEPLOYMENT_BUCKET }}/backend/freight-quote-backend.jar /opt/freight-quote/freight-quote-backend.jar",
-              "echo \"Refreshing environment configuration from S3...\"",
-              "aws s3 cp s3://${{ secrets.DEV_DEPLOYMENT_BUCKET }}/config/application.env /opt/freight-quote/application.env",
-              "sudo chown freight-quote:freight-quote /opt/freight-quote/application.env",
-              "sudo chmod 600 /opt/freight-quote/application.env",
-              "sudo chown freight-quote:freight-quote /opt/freight-quote/freight-quote-backend.jar",
-              "sudo chmod 500 /opt/freight-quote/freight-quote-backend.jar",
-              "echo \"Starting application...\"",
-              "sudo systemctl start freight-quote-backend",
-              "echo \"Waiting for application to start...\"",
-              "sleep 15",
-              "echo \"Checking application health...\"",
-              "curl -f http://localhost:8080/actuator/health || exit 1",
-              "echo \"[$(date)] Deployment successful!\""
-            ]' \
+            --parameters 'commands=["/opt/freight-quote/deploy.sh ${{ secrets.DEV_DEPLOYMENT_BUCKET }}"]' \
             --comment "Deploy backend to dev" \
             --output text \
             --query 'Command.CommandId')
