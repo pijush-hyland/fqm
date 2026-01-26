@@ -3,6 +3,8 @@ package com.freightquote.config;
 import java.util.Arrays;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +16,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+
+    private static final Logger logger = LoggerFactory.getLogger(WebConfig.class);
 
     @Value("${cors.allowed-origins}")
     private String allowedOrigins;
@@ -37,6 +41,7 @@ public class WebConfig implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         // Parse allowed origins from comma-separated string
         String[] origins = allowedOrigins.split(",");
+        logger.info("Allowed origins: {}", allowedOrigins);
         
         // Parse allowed methods
         String[] methods = allowedMethods.split(",");
