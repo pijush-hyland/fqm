@@ -45,7 +45,6 @@ public class WebConfig implements WebMvcConfigurer {
         List<String> origins = Arrays.stream(allowedOrigins.split(","))
                                      .map(String::trim)
                                      .collect(Collectors.toList());
-        logger.info("Allowed origins: {}", origins);
         configuration.setAllowedOrigins(origins);
         
         // Parse allowed methods
