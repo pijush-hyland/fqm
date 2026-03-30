@@ -22,7 +22,7 @@ import com.freightquote.service.LocationService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/locations")
+@RequestMapping("/locations")
 public class LocationController {
     
     @Autowired

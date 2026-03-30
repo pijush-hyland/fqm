@@ -19,7 +19,7 @@ import jakarta.validation.Valid;
  * Controller dedicated to freight quotation and rate matching for customers
  */
 @RestController
-@RequestMapping("/api/quotes")
+@RequestMapping("/quotes")
 public class QuoteController {
     
     @Autowired
@@ -32,7 +32,7 @@ public class QuoteController {
      * It takes shipping requirements and returns matching rates with calculated costs.
      *
      * Example request:
-     * POST /api/quotes/get-quotes
+     * POST /quotes/get-quotes
      * {
      *   "origin": 1,
      *   "destination": 2,

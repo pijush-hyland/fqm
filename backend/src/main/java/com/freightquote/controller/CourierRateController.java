@@ -25,7 +25,7 @@ import com.freightquote.service.CourierRateService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/courier-rates")
+@RequestMapping("/courier-rates")
 public class CourierRateController {
 
     @Autowired

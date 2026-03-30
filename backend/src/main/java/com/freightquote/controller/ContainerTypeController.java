@@ -22,7 +22,7 @@ import com.freightquote.service.ContainerTypeService;
 import jakarta.validation.Valid;
 
 @RestController
-@RequestMapping("/api/container-types")
+@RequestMapping("/container-types")
 public class ContainerTypeController {
     
     @Autowired
