@@ -5,6 +5,7 @@ import LocationSelector from '../../components/LocationSelector';
 import { cargoTypeCategories } from '../../components/CargoTypeForm';
 import type { courierRate, ShippingType, SeaFreightMode, CourierRatePayload } from '../../types/courierRate.type';
 import type { ContainerType } from '../../types/container.type';
+import NumberInput from '../../common/components/NumberInput';
 
 interface CourierRateFilters {
 	courierName: string;
@@ -377,12 +378,10 @@ const CourierRatesAdmin = () => {
 											</p>
 										</div>
 										<div className="flex-shrink-0">
-											<input
-												type="number"
+											<NumberInput
 												placeholder="Enter rate"
-												value={formData.ratesForFCL?.[containerType.id] || ''}
-												onChange={(e) => {
-													const rate = e.target.value ? parseFloat(e.target.value) : undefined;
+												value={formData.ratesForFCL?.[containerType.id]}
+												onChange={(rate) => {
 													const updatedRates = { ...formData.ratesForFCL };
 													if (rate !== undefined && rate > 0) {
 														updatedRates[containerType.id] = rate;
@@ -465,21 +464,6 @@ const CourierRatesAdmin = () => {
 			);
 		}
 		return null;
-	};
-
-	const handleNumberChange = (
-		e: React.ChangeEvent<HTMLInputElement>,
-		field: keyof Pick<RateFormData, 'rate' | 'transitDays'>
-	) => {
-		const value = e.target.value;
-		if (value === '') {
-			handleFormChange(field, 0);
-		} else {
-			const numValue = parseFloat(value);
-			if (!isNaN(numValue) && numValue >= 0) {
-				handleFormChange(field, numValue);
-			}
-		}
 	};
 
 	return (
@@ -701,7 +685,7 @@ const CourierRatesAdmin = () => {
 											type="text"
 											
 											value={formData.courierName}
-											onChange={(e) => handleFormChange('courierName', e.target.value)}
+										onChange={(e) => handleFormChange('courierName', e.target.value.toUpperCase())}
 											className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors ${
 												validationErrors.courierName ? 'border-red-500 bg-red-50' : 'border-gray-300'
 											}`}
@@ -721,12 +705,11 @@ const CourierRatesAdmin = () => {
 										</div>
 									</div>
 								</div>
-										<input
-											type="number"
-											step="0.01"
-											min="0.1"
-											value={formData.rate}
-											onChange={(e) => handleNumberChange(e, 'rate')}
+									<NumberInput
+										step="0.01"
+										min="0.1"
+										value={formData.rate}
+										onChange={(val) => handleFormChange('rate', val)}
 											className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors ${
 												validationErrors.rate ? 'border-red-500 bg-red-50' : 'border-gray-300'
 											}`}
@@ -867,10 +850,9 @@ const CourierRatesAdmin = () => {
 								<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 									<div>
 										<label className="block text-sm font-medium text-gray-700 mb-2">Transit Days</label>
-										<input
-											type="number"
-											value={formData.transitDays}
-											onChange={(e) => handleFormChange('transitDays', Number(e.target.value))}
+									<NumberInput
+										value={formData.transitDays}
+										onChange={(val) => handleFormChange('transitDays', val)}
 											className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors ${
 												validationErrors.transitDays ? 'border-red-500 bg-red-50' : 'border-gray-300'
 											}`}

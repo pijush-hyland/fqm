@@ -6,14 +6,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import com.freightquote.enums.SeaFreightMode;
-import com.freightquote.enums.ShippingType;
 import com.freightquote.entity.AirFreightRate;
 import com.freightquote.entity.ContainerType;
 import com.freightquote.entity.CourierRate;
 import com.freightquote.entity.FCLFreightRate;
 import com.freightquote.entity.LCLFreightRate;
 import com.freightquote.entity.Location;
+import com.freightquote.enums.SeaFreightMode;
+import com.freightquote.enums.ShippingType;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -132,7 +132,7 @@ public class CourierRateDto {
 	public CourierRate toEntity() {
 		CourierRate entity = new CourierRate();
 		entity.setId(this.id);
-		entity.setCourierName(this.courierName);
+		entity.setCourierName(this.courierName != null ? this.courierName.toUpperCase() : null);
 		entity.setOrigin(this.origin);
 		entity.setDestination(this.destination);
 		entity.setShippingType(this.shippingType);
