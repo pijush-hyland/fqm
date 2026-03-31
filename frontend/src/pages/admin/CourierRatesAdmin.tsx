@@ -697,11 +697,11 @@ const CourierRatesAdmin = () => {
 									<label className="block text-sm font-medium text-gray-700">Rate *</label>
 									<div className="relative group">
 										<span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-gray-300 text-gray-600 text-xs cursor-help">?</span>
-										<div className="absolute z-10 left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 p-3 bg-gray-900 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
+										<div className="absolute z-10 left-1/2 -translate-x bottom-full mb-2 w-64 p-3 bg-gray-900 text-white text-xs rounded-t-lg rounded-br-lg shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
 											{formData.shippingType === 'AIR' && <span>Air Freight: Rate per kilogram (kg) of chargeable weight (higher of actual or volumetric weight).</span>}
 											{formData.shippingType === 'WATER' && formData.seaFreightMode === 'LCL' && <span>LCL Sea Freight: Rate per cubic metre (CBM) of chargeable volume (higher of actual volume or weight/1000).</span>}
 											{(!formData.shippingType || (formData.shippingType !== 'AIR' && !(formData.shippingType === 'WATER' && formData.seaFreightMode === 'LCL'))) && <span>Select a shipping type to see rate description.</span>}
-											<div className="absolute left-1/2 -translate-x-1/2 top-full border-4 border-transparent border-t-gray-900"></div>
+											<div className="absolute left-0 -translate-x top-full border-4 border-transparent border-t-gray-900"></div>
 										</div>
 									</div>
 								</div>
