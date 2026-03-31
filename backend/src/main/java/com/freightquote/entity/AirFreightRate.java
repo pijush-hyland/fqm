@@ -2,7 +2,7 @@ package com.freightquote.entity;
 
 import java.math.BigDecimal;
 
-import com.freightquote.ENUM.ShippingType;
+import com.freightquote.enums.ShippingType;
 import com.freightquote.dto.ShippingRequirementDto;
 
 import jakarta.persistence.Column;

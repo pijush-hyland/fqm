@@ -9,8 +9,8 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import com.freightquote.ENUM.SeaFreightMode;
-import com.freightquote.ENUM.ShippingType;
+import com.freightquote.enums.SeaFreightMode;
+import com.freightquote.enums.ShippingType;
 import com.freightquote.entity.CourierRate;
 
 @Repository
@@ -68,8 +68,8 @@ public interface CourierRateRepository extends JpaRepository<CourierRate, Long>,
 		"WHERE LOWER(cr.courierName) = LOWER(:courierName) AND " +
 		"cr.origin.id = :originId AND " +
 		"cr.destination.id = :destinationId AND " +
-		"cr.shippingType = com.freightquote.ENUM.ShippingType.WATER AND " +
-		"cr.seaFreightMode = com.freightquote.ENUM.SeaFreightMode.FCL AND " +
+		"cr.shippingType = com.freightquote.enums.ShippingType.WATER AND " +
+		"cr.seaFreightMode = com.freightquote.enums.SeaFreightMode.FCL AND " +
 		"fcl.containerType.id = :containerTypeId AND " +
 		"NOT (cr.effectiveTo < :newEffectiveFrom OR cr.effectiveFrom > :newEffectiveTo)")
 	List<CourierRate> findConflictingFCLRatesForContainerType(

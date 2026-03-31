@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+﻿import { Link } from 'react-router-dom';
 
 const Home = () => {
 	return (
@@ -49,6 +49,10 @@ const Home = () => {
 							<div className="w-16 h-16 mx-auto mb-4 text-blue-500">
 								<svg viewBox="0 0 24 24" fill="currentColor" className="w-full h-full">
 									<path d="M19 18H5a1 1 0 0 1-1-1v-1h16v1a1 1 0 0 1-1 1M3 14v1a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3v-1H3m2-1h14l-1-6H6l-1 6m2.5-7h9l.5 1H7.5l.5-1M12 2L9 5h6l-3-3Z" />
+									{/* Wave 1 */}
+									<path d="M0 18 q3-1.5 6 0 q3 1.5 6 0 q3-1.5 6 0 q3 1.5 6 0" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" />
+									{/* Wave 2 */}
+									<path d="M0 19.5 q3-1.5 6 0 q3 1.5 6 0 q3-1.5 6 0 q3 1.5 6 0" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" opacity="0.5" />
 								</svg>
 							</div>
 							<h3 className="text-gray-400 text-xl font-semibold mb-2 group-hover:text-blue-400 transition-colors">

@@ -17,8 +17,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.freightquote.ENUM.SeaFreightMode;
-import com.freightquote.ENUM.ShippingType;
+import com.freightquote.enums.SeaFreightMode;
+import com.freightquote.enums.ShippingType;
 import com.freightquote.dto.CourierRateDto;
 import com.freightquote.dto.CourierRateSearchCriteriaDto;
 import com.freightquote.entity.AirFreightRate;

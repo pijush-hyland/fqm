@@ -2,8 +2,8 @@ package com.freightquote.dto;
 
 import java.time.LocalDate;
 
-import com.freightquote.ENUM.SeaFreightMode;
-import com.freightquote.ENUM.ShippingType;
+import com.freightquote.enums.SeaFreightMode;
+import com.freightquote.enums.ShippingType;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

@@ -66,7 +66,7 @@ function AppContent() {
           <div className="max-w-7xl mx-auto flex justify-between items-center">
             <div>
               <Link to={"/"} className="text-blue-500/90 hover:text-blue-600 transition-colors font-bold text-2xl cursor-pointer">
-                FreightQuote
+                RFQ
               </Link>
               {isAdminPage && <Link to="/admin" className="text-gray-500 font-bold ml-2 text-sm align-super">Admin</Link>}
             </div>

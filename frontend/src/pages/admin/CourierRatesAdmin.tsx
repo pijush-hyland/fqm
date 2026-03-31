@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import courierRateAPI from '../../apis/courierRateAPI';
 import containerTypeAPI from '../../apis/containerTypeAPI';
 import LocationSelector from '../../components/LocationSelector';
-import { cargoTypeCategories } from '../../components/CargoTypeFormModular';
+import { cargoTypeCategories } from '../../components/CargoTypeForm';
 import type { courierRate, ShippingType, SeaFreightMode, CourierRatePayload } from '../../types/courierRate.type';
 import type { ContainerType } from '../../types/container.type';
 
@@ -142,9 +142,9 @@ const CourierRatesAdmin = () => {
 
 		// Courier Name validation
 		if (!formData.courierName || formData.courierName.trim().length < 2) {
-			errors.courierName = 'Courier name must be at least 2 characters long';
-		} else if (formData.courierName.trim().length > 100) {
-			errors.courierName = 'Courier name cannot exceed 100 characters';
+				errors.courierName = 'Carrier name must be at least 2 characters long';
+			} else if (formData.courierName.trim().length > 100) {
+				errors.courierName = 'Carrier name cannot exceed 100 characters';
 		}
 
 		// Origin validation
@@ -513,10 +513,10 @@ const CourierRatesAdmin = () => {
 				<h2 className="text-lg font-semibold mb-4">Filters</h2>
 				<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
 					<div>
-						<label className="block text-sm font-medium text-gray-700 mb-2">Courier Name</label>
+						<label className="block text-sm font-medium text-gray-700 mb-2">Carrier</label>
 						<input
 							type="text"
-							placeholder="Search courier..."
+							placeholder="Search carrier..."
 							value={filters.courierName}
 							onChange={(e) => handleFilterChange('courierName', e.target.value)}
 							className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors border-gray-300"
@@ -696,7 +696,7 @@ const CourierRatesAdmin = () => {
 								{/* Basic Information */}
 								<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 									<div>
-										<label className="block text-sm font-medium text-gray-700 mb-2">Courier Name *</label>
+										<label className="block text-sm font-medium text-gray-700 mb-2">Carrier *</label>
 										<input
 											type="text"
 											
@@ -709,7 +709,18 @@ const CourierRatesAdmin = () => {
 										<ErrorMessage error={validationErrors.courierName} />
 									</div>
 									{!(formData.shippingType === 'WATER' && formData.seaFreightMode === 'FCL') && (<div>
-										<label className="block text-sm font-medium text-gray-700 mb-2">Rate *</label>
+								<div className="flex items-center space-x-1 mb-2">
+									<label className="block text-sm font-medium text-gray-700">Rate *</label>
+									<div className="relative group">
+										<span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-gray-300 text-gray-600 text-xs cursor-help">?</span>
+										<div className="absolute z-10 left-1/2 -translate-x-1/2 bottom-full mb-2 w-64 p-3 bg-gray-900 text-white text-xs rounded-lg shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
+											{formData.shippingType === 'AIR' && <span>Air Freight: Rate per kilogram (kg) of chargeable weight (higher of actual or volumetric weight).</span>}
+											{formData.shippingType === 'WATER' && formData.seaFreightMode === 'LCL' && <span>LCL Sea Freight: Rate per cubic metre (CBM) of chargeable volume (higher of actual volume or weight/1000).</span>}
+											{(!formData.shippingType || (formData.shippingType !== 'AIR' && !(formData.shippingType === 'WATER' && formData.seaFreightMode === 'LCL'))) && <span>Select a shipping type to see rate description.</span>}
+											<div className="absolute left-1/2 -translate-x-1/2 top-full border-4 border-transparent border-t-gray-900"></div>
+										</div>
+									</div>
+								</div>
 										<input
 											type="number"
 											step="0.01"
@@ -918,3 +929,4 @@ const CourierRatesAdmin = () => {
 };
 
 export default CourierRatesAdmin;
+

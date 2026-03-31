@@ -1,4 +1,4 @@
-package com.freightquote.ENUM;
+package com.freightquote.enums;
 
 public enum PricingModel {
     AIR_PER_KG,           // Air freight: price per kilogram

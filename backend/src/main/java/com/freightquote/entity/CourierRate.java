@@ -7,8 +7,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import com.freightquote.ENUM.SeaFreightMode;
-import com.freightquote.ENUM.ShippingType;
+import com.freightquote.enums.SeaFreightMode;
+import com.freightquote.enums.ShippingType;
 import com.freightquote.dto.ShippingRequirementDto;
 
 import jakarta.persistence.CascadeType;

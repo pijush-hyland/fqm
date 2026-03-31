@@ -53,9 +53,9 @@ export const cargoTypeCategories = {
 	]
 };
 
-interface CargoTypeFormModularProps extends StepComponentProps<QuoteFormData> { }
+interface CargoTypeFormProps extends StepComponentProps<QuoteFormData> { }
 
-const CargoTypeFormModular: React.FC<CargoTypeFormModularProps> = ({
+const CargoTypeForm: React.FC<CargoTypeFormProps> = ({
 	formData,
 	errors,
 	onInputChange
@@ -162,4 +162,4 @@ const CargoTypeFormModular: React.FC<CargoTypeFormModularProps> = ({
 	);
 };
 
-export default CargoTypeFormModular;
+export default CargoTypeForm;

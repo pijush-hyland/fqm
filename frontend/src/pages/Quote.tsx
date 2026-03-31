@@ -5,10 +5,10 @@ import MultiStepForm, {
 	type StepComponentProps
 } from '../components/MultiStepForm';
 import LocationSelector from '../components/LocationSelector';
-import ShippingDetailsFormModular from '../components/ShippingDetailsFormModular';
-import PackageDetailsFormModular from '../components/PackageDetailsFormModular';
-import ContainerDetailsFormModular from '../components/ContainerDetailsFormModular';
-import CargoTypeFormModular from '../components/CargoTypeFormModular';
+import ShippingDetailsForm from '../components/ShippingDetailsForm';
+import PackageDetailsForm from '../components/PackageDetailsForm';
+import ContainerDetailsForm from '../components/ContainerDetailsForm';
+import CargoTypeForm from '../components/CargoTypeForm';
 import type { QuoteFormData } from '../types/quoteForm.type';
 import type { QuoteRequirement } from '../types/quoteRequirement.type';
 import type { ShippingType, SeaFreightMode } from '../types/courierRate.type';
@@ -148,9 +148,9 @@ const Quote = () => {
 		return formData.shippingType !== 'AIR' && formData.seaFreightMode !== 'LCL';
 	};
 
-	// Step components - using the modular compatible component
+	// Step components - using the component
 	const ShippingDetailsStep = (props: StepComponentProps<QuoteFormData>) => (
-		<ShippingDetailsFormModular {...props} />
+		<ShippingDetailsForm {...props} />
 	);
 
 	const LocationsStep = ({ formData, errors, onInputChange }: StepComponentProps<QuoteFormData>) => (
@@ -178,15 +178,15 @@ const Quote = () => {
 	);
 
 	const ContainerStep = (props: StepComponentProps<QuoteFormData>) => (
-		<ContainerDetailsFormModular {...props} />
+		<ContainerDetailsForm {...props} />
 	);
 
 	const PackageStep = (props: StepComponentProps<QuoteFormData>) => (
-		<PackageDetailsFormModular {...props} />
+		<PackageDetailsForm {...props} />
 	);
 
 	const CargoTypeStep = (props: StepComponentProps<QuoteFormData>) => (
-		<CargoTypeFormModular {...props} />
+		<CargoTypeForm {...props} />
 	);
 
 	// const SummaryStep = ({ formData }: StepComponentProps<QuoteFormData>) => (

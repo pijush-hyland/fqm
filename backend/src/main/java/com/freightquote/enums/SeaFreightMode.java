@@ -1,4 +1,4 @@
-package com.freightquote.ENUM;
+package com.freightquote.enums;
 
 public enum SeaFreightMode {
     FCL, LCL

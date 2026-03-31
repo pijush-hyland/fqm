@@ -4,8 +4,8 @@ import java.util.Set;
 
 import org.springframework.data.jpa.domain.Specification;
 
-import com.freightquote.ENUM.SeaFreightMode;
-import com.freightquote.ENUM.ShippingType;
+import com.freightquote.enums.SeaFreightMode;
+import com.freightquote.enums.ShippingType;
 import com.freightquote.dto.ShippingRequirementDto;
 import com.freightquote.entity.CourierRate;
 

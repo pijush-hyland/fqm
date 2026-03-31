@@ -8,7 +8,7 @@ import type { QuoteFormData } from '../types/quoteForm.type';
 import type { courierRate, ShippingType, SeaFreightMode } from '../types/courierRate.type';
 import type { LocationType } from '../types/location.type';
 import type { ContainerType } from '../types/container.type';
-import { cargoTypeCategories } from '../components/CargoTypeFormModular';
+import { cargoTypeCategories } from '../components/CargoTypeForm';
 import containerTypeAPI from '../apis/containerTypeAPI';
 
 // Filter form data type (excludes maxTransitDays)
