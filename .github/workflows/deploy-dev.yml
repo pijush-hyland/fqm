@@ -72,7 +72,7 @@ jobs:
         env:
           VITE_API_BASE_URL: ${{ secrets.DEV_API_URL }}
           VITE_ENABLE_DEBUG: "true"
-          VITE_APP_NAME: "Freight Quote (Dev)"
+          VITE_APP_NAME: "RFQ (Dev)"
           VITE_APP_VERSION: ${{ github.sha }}
         run: |
           echo "=========================================="
@@ -90,7 +90,7 @@ jobs:
         env:
           VITE_API_BASE_URL: ${{ secrets.DEV_API_URL }}
           VITE_ENABLE_DEBUG: "true"
-          VITE_APP_NAME: "Freight Quote (Dev)"
+          VITE_APP_NAME: "RFQ (Dev)"
           VITE_APP_VERSION: ${{ github.sha }}
         run: npm run build -- --logLevel info
 

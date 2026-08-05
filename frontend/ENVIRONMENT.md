@@ -33,7 +33,7 @@ The following environment files are available:
 import { env, isDevelopment, isProduction } from './utilities/env';
 
 // Access environment variables
-console.log(env.APP_NAME); // "Freight UI"
+console.log(env.APP_NAME); // "RFQ"
 console.log(env.API_BASE_URL); // "http://localhost:8080" or production URL
 
 // Environment checks

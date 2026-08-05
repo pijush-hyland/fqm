@@ -1,7 +1,7 @@
 // Environment configuration utility
 export const env = {
   // App Info
-  APP_NAME: import.meta.env.VITE_APP_NAME || 'Freight UI',
+  APP_NAME: import.meta.env.VITE_APP_NAME || 'RFQ',
   APP_VERSION: import.meta.env.VITE_APP_VERSION || '1.0.0',
   
   // API Configuration
