@@ -341,10 +341,28 @@ const CourierRatesAdmin = () => {
 		return 'AIRPORT';
 	};
 
+	const renderCurrencyField = () => (
+		<div>
+			<label className="block text-sm font-medium text-gray-700 mb-2">Currency</label>
+			<select
+				value={formData.currency}
+				onChange={(e) => handleFormChange('currency', e.target.value)}
+				className="w-full px-4 py-3 pr-10 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors border-gray-300 appearance-none bg-white"
+			>
+				<option value="INR">INR</option>
+				<option value="USD">USD</option>
+				<option value="EUR">EUR</option>
+			</select>
+		</div>
+	);
+
 	const renderConditionalFields = () => {
 		if (formData.shippingType === 'WATER' && formData.seaFreightMode === 'FCL') {
 			return (
 				<div className="space-y-4">
+					<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+						{renderCurrencyField()}
+					</div>
 					<div>
 						<label className="block text-sm font-medium text-gray-700 mb-2">Container Type Rates</label>
 						<p className="text-sm text-gray-600 mb-3">
@@ -479,8 +497,8 @@ const CourierRatesAdmin = () => {
 			)}
 
 			{/* Header */}
-			<div className="flex justify-between items-center mb-6 flex-row-reverse">
-				{/* <h1 className="text-3xl font-bold text-gray-900">Courier Rate Management</h1> */}
+			<div className="flex justify-between items-center mb-6">
+				<h1 className="text-3xl font-bold text-gray-900">My Pricing</h1>
 				<button
 					onClick={openCreateModal}
 					className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center"
@@ -692,30 +710,6 @@ const CourierRatesAdmin = () => {
 										/>
 										<ErrorMessage error={validationErrors.courierName} />
 									</div>
-									{!(formData.shippingType === 'WATER' && formData.seaFreightMode === 'FCL') && (<div>
-								<div className="flex items-center space-x-1 mb-2">
-									<label className="block text-sm font-medium text-gray-700">Rate *</label>
-									<div className="relative group">
-										<span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-gray-300 text-gray-600 text-xs cursor-help">?</span>
-										<div className="absolute z-10 left-1/2 -translate-x bottom-full mb-2 w-64 p-3 bg-gray-900 text-white text-xs rounded-t-lg rounded-br-lg shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
-											{formData.shippingType === 'AIR' && <span>Air Freight: Rate per kilogram (kg) of chargeable weight (higher of actual or volumetric weight).</span>}
-											{formData.shippingType === 'WATER' && formData.seaFreightMode === 'LCL' && <span>LCL Sea Freight: Rate per cubic metre (CBM) of chargeable volume (higher of actual volume or weight/1000).</span>}
-											{(!formData.shippingType || (formData.shippingType !== 'AIR' && !(formData.shippingType === 'WATER' && formData.seaFreightMode === 'LCL'))) && <span>Select a shipping type to see rate description.</span>}
-											<div className="absolute left-0 -translate-x top-full border-4 border-transparent border-t-gray-900"></div>
-										</div>
-									</div>
-								</div>
-									<NumberInput
-										step="0.01"
-										min="0.1"
-										value={formData.rate}
-										onChange={(val) => handleFormChange('rate', val)}
-											className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors ${
-												validationErrors.rate ? 'border-red-500 bg-red-50' : 'border-gray-300'
-											}`}
-										/>
-										<ErrorMessage error={validationErrors.rate} />
-									</div>)}
 								</div>
 
 								{/* Shipping Type and Mode */}
@@ -747,6 +741,36 @@ const CourierRatesAdmin = () => {
 										</div>
 									)}
 								</div>
+
+								{!(formData.shippingType === 'WATER' && formData.seaFreightMode === 'FCL') && (
+									<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+										{renderCurrencyField()}
+										<div>
+											<div className="flex items-center space-x-1 mb-2">
+												<label className="block text-sm font-medium text-gray-700">Rate *</label>
+												<div className="relative group">
+													<span className="inline-flex items-center justify-center w-4 h-4 rounded-full bg-gray-300 text-gray-600 text-xs cursor-help">?</span>
+													<div className="absolute z-10 left-1/2 -translate-x bottom-full mb-2 w-64 p-3 bg-gray-900 text-white text-xs rounded-t-lg rounded-br-lg shadow-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity">
+														{formData.shippingType === 'AIR' && <span>Air Freight: Rate per kilogram (kg) of chargeable weight (higher of actual or volumetric weight).</span>}
+														{formData.shippingType === 'WATER' && formData.seaFreightMode === 'LCL' && <span>LCL Sea Freight: Rate per cubic metre (CBM) of chargeable volume (higher of actual volume or weight/1000).</span>}
+														{(!formData.shippingType || (formData.shippingType !== 'AIR' && !(formData.shippingType === 'WATER' && formData.seaFreightMode === 'LCL'))) && <span>Select a shipping type to see rate description.</span>}
+														<div className="absolute left-0 -translate-x top-full border-4 border-transparent border-t-gray-900"></div>
+													</div>
+													</div>
+												</div>
+											<NumberInput
+												step="0.01"
+												min="0.1"
+												value={formData.rate}
+												onChange={(val) => handleFormChange('rate', val)}
+												className={`w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors ${
+													validationErrors.rate ? 'border-red-500 bg-red-50' : 'border-gray-300'
+												}`}
+											/>
+											<ErrorMessage error={validationErrors.rate} />
+										</div>
+									</div>
+								)}
 
 								{/* Locations */}
 								<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -847,7 +871,7 @@ const CourierRatesAdmin = () => {
 								</div>
 
 								{/* Additional Fields */}
-								<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+								<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 									<div>
 										<label className="block text-sm font-medium text-gray-700 mb-2">Transit Days</label>
 									<NumberInput
@@ -858,18 +882,6 @@ const CourierRatesAdmin = () => {
 											}`}
 										/>
 										<ErrorMessage error={validationErrors.transitDays} />
-									</div>
-									<div>
-										<label className="block text-sm font-medium text-gray-700 mb-2">Currency</label>
-										<select
-											value={formData.currency}
-											onChange={(e) => handleFormChange('currency', e.target.value)}
-											className="w-full px-4 py-3 pr-10 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors border-gray-300 appearance-none bg-white"
-										>
-											<option value="INR">INR</option>
-											<option value="USD">USD</option>
-											<option value="EUR">EUR</option>
-										</select>
 									</div>
 									<div className="flex items-center">
 										<label className="flex items-center">

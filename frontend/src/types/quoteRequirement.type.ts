@@ -16,4 +16,5 @@ export type QuoteRequirement = {
 
     cargoTypeCategory: string; // e.g., "Electronics", "Furniture"
     cargoType: string; // e.g., "Fragile", "Non-Fragile"
+    remarks?: string;
 };

@@ -11,8 +11,8 @@ import type { ContainerType } from '../types/container.type';
 import { cargoTypeCategories } from '../components/CargoTypeForm';
 import containerTypeAPI from '../apis/containerTypeAPI';
 
-// Filter form data type (excludes maxTransitDays)
-interface QuotationFilters extends Omit<QuoteFormData, 'maxTransitDays'> { }
+// Filter form data type (excludes fields that are not search filters)
+interface QuotationFilters extends Omit<QuoteFormData, 'maxTransitDays' | 'remarks'> { }
 
 const Quotations = () => {
 	const location = useLocation();
@@ -124,7 +124,8 @@ const Quotations = () => {
 			volumeCBM: filters.volumeCBM as number,
 			containerCount: Object.keys(filters.containerCount).length > 0 ? filters.containerCount : undefined,
 			cargoTypeCategory: filters.cargoTypeCategory,
-			cargoType: filters.cargoType
+			cargoType: filters.cargoType,
+			remarks: quoteRequirement?.remarks
 		};
 
 		// Update navigation state with new search requirement

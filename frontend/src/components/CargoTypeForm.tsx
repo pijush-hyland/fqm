@@ -1,6 +1,6 @@
 import React from 'react';
 import type { StepComponentProps } from './MultiStepForm';
-import type { QuoteFormData } from '../types/quoteForm.type';
+import { QUOTE_REMARKS_MAX_LENGTH, type QuoteFormData } from '../types/quoteForm.type';
 
 // Define cargo type categories and their subcategories
 export const cargoTypeCategories = {
@@ -158,6 +158,29 @@ const CargoTypeForm: React.FC<CargoTypeFormProps> = ({
 					</div>
 				</div>
 			)}
+
+			<div>
+				<label htmlFor="remarks" className="block text-sm font-medium text-gray-700 mb-2">
+					Remarks
+				</label>
+				<textarea
+					id="remarks"
+					value={formData.remarks}
+					onChange={(event) => onInputChange('remarks', event.target.value)}
+					maxLength={QUOTE_REMARKS_MAX_LENGTH}
+					rows={4}
+					placeholder="Add any extra information that will help us prepare your quote"
+					className={`w-full px-3 py-2 border rounded-md shadow-sm resize-y focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 ${errors.remarks ? 'border-red-300' : 'border-gray-300'}`}
+				/>
+				<div className="mt-1 flex justify-between gap-4 text-sm">
+					{errors.remarks ? (
+						<p className="text-red-600">{errors.remarks}</p>
+					) : (
+						<span />
+					)}
+					<span className="text-gray-500">{formData.remarks.length}/{QUOTE_REMARKS_MAX_LENGTH}</span>
+				</div>
+			</div>
 		</div>
 	);
 };

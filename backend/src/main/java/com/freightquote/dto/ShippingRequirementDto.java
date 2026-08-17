@@ -7,6 +7,7 @@ import com.freightquote.enums.SeaFreightMode;
 import com.freightquote.enums.ShippingType;
 
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -49,4 +50,7 @@ public class ShippingRequirementDto {
     private Integer maxTransitDays;
 
     private Map<Long, Integer> containerCount; // Map of containerTypeId to count
+
+    @Size(max = 1000, message = "Remarks cannot exceed 1,000 characters")
+    private String remarks;
 }

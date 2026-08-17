@@ -1,5 +1,7 @@
 import type { ShippingType, SeaFreightMode } from './courierRate.type';
 
+export const QUOTE_REMARKS_MAX_LENGTH = 1000;
+
 export interface QuoteFormData {
 	origin: number | null;
 	destination: number | null;
@@ -14,6 +16,7 @@ export interface QuoteFormData {
 
 	cargoTypeCategory: string;
 	cargoType: string;
+	remarks: string;
 }
 
 export interface QuoteFormErrors {
@@ -29,4 +32,5 @@ export interface QuoteFormErrors {
 	maxTransitDays?: string;
 	cargoTypeCategory?: string;
 	cargoType?: string;
+	remarks?: string;
 }

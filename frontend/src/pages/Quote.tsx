@@ -9,7 +9,7 @@ import ShippingDetailsForm from '../components/ShippingDetailsForm';
 import PackageDetailsForm from '../components/PackageDetailsForm';
 import ContainerDetailsForm from '../components/ContainerDetailsForm';
 import CargoTypeForm from '../components/CargoTypeForm';
-import type { QuoteFormData } from '../types/quoteForm.type';
+import { QUOTE_REMARKS_MAX_LENGTH, type QuoteFormData } from '../types/quoteForm.type';
 import type { QuoteRequirement } from '../types/quoteRequirement.type';
 import type { ShippingType, SeaFreightMode } from '../types/courierRate.type';
 import type { LocationType } from '../types/location.type';
@@ -35,6 +35,7 @@ const Quote = () => {
 		containerCount: {},
 		cargoTypeCategory: '',
 		cargoType: '',
+		remarks: '',
 	};
 
 	// Validation functions
@@ -124,6 +125,9 @@ const Quote = () => {
 		}
 		if (!formData.cargoType) {
 			errors.cargoType = 'Specific cargo type is required';
+		}
+		if (formData.remarks.length > QUOTE_REMARKS_MAX_LENGTH) {
+			errors.remarks = `Remarks cannot exceed ${QUOTE_REMARKS_MAX_LENGTH.toLocaleString()} characters`;
 		}
 
 		return {
@@ -266,7 +270,8 @@ const Quote = () => {
 			maxTransitDays: formData.maxTransitDays as number || undefined,
 			containerCount: Object.keys(formData.containerCount).length > 0 ? formData.containerCount : undefined,
 			cargoTypeCategory: formData.cargoTypeCategory,
-			cargoType: formData.cargoType
+			cargoType: formData.cargoType,
+			remarks: formData.remarks || undefined
 		};
 
 		// Submit the quote request
