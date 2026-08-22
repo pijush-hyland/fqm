@@ -129,7 +129,7 @@ public class QuoteService {
                 || option.getName() == null || option.getName().isBlank()
                 || !isPositive(option.getCapacityCbm())
                 || !isPositive(option.getMaximumCargoWeightKg())
-                || !isAbsentOrPositive(option.getTareWeightKG())
+                || !isAbsentOrPositive(option.getTareWeightKg())
                 || !hasValidMaximumTotalWeight(option)) {
             return false;
         }

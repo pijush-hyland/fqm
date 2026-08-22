@@ -10,7 +10,7 @@ const API_CONFIG = {
 };
 
 // Generic fetch wrapper with environment-aware configuration
-export const apiRequest = async <T = any>(
+export const apiRequest = async <T = unknown>(
   endpoint: string,
   options: RequestInit = {}
 ): Promise<T> => {
@@ -82,24 +82,24 @@ export const apiRequest = async <T = any>(
 
 // Convenience methods for different HTTP verbs
 export const api = {
-  get: <T = any>(endpoint: string, options?: RequestInit) =>
+  get: <T = unknown>(endpoint: string, options?: RequestInit) =>
     apiRequest<T>(endpoint, { ...options, method: 'GET' }),
     
-  post: <T = any>(endpoint: string, data?: any, options?: RequestInit) =>
+  post: <T = unknown>(endpoint: string, data?: unknown, options?: RequestInit) =>
     apiRequest<T>(endpoint, {
       ...options,
       method: 'POST',
       body: data ? JSON.stringify(data) : undefined,
     }),
     
-  put: <T = any>(endpoint: string, data?: any, options?: RequestInit) =>
+  put: <T = unknown>(endpoint: string, data?: unknown, options?: RequestInit) =>
     apiRequest<T>(endpoint, {
       ...options,
       method: 'PUT',
       body: data ? JSON.stringify(data) : undefined,
     }),
     
-  delete: <T = any>(endpoint: string, options?: RequestInit) =>
+  delete: <T = unknown>(endpoint: string, options?: RequestInit) =>
     apiRequest<T>(endpoint, { ...options, method: 'DELETE' }),
 };
 

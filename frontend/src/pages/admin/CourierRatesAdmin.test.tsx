@@ -8,7 +8,7 @@ import type { courierRate } from '../../types/courierRate.type';
 import CourierRatesAdmin from './CourierRatesAdmin';
 
 vi.mock('../../apis/containerTypeAPI', () => ({
-  default: { getAll: vi.fn() },
+  default: { getAdministrationOptions: vi.fn() },
 }));
 
 vi.mock('../../apis/courierRateAPI', () => ({
@@ -70,7 +70,7 @@ const existingRate: courierRate = {
 };
 
 beforeEach(() => {
-  vi.mocked(containerTypeAPI.getAll).mockResolvedValue(options);
+  vi.mocked(containerTypeAPI.getAdministrationOptions).mockResolvedValue(options);
   vi.mocked(courierRateAPI.getAllRates).mockResolvedValue([existingRate]);
 });
 

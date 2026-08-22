@@ -1,4 +1,4 @@
-import type { CourierRatePayload, SeaFreightMode, ShippingType } from "../types/courierRate.type";
+import type { courierRate, CourierRatePayload, SeaFreightMode, ShippingType } from "../types/courierRate.type";
 import type { CourierRateSearchCriteria } from "../types/courierRateSearchCriteria.type";
 import { api } from "./api";
 
@@ -19,7 +19,7 @@ export const COURIER_RATE_URL = {
 };
 
 const courierRateAPI = {
-  getAllRates: () => api.get(COURIER_RATE_URL.getAllRates), //use
+  getAllRates: () => api.get<courierRate[]>(COURIER_RATE_URL.getAllRates), //use
   getRateById: (id: string) => api.get(COURIER_RATE_URL.getRateById.replace(":id", id)),
   createRate: (data: CourierRatePayload) => api.post(COURIER_RATE_URL.createRate, data), //use
   updateRate: (id: string, data: CourierRatePayload) => api.put(COURIER_RATE_URL.updateRate.replace(":id", id), data), //use

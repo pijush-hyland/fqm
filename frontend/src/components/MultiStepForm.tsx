@@ -36,7 +36,7 @@ export interface MultiStepFormProps<TFormData> {
 	className?: string;
 }
 
-const MultiStepForm = <TFormData extends Record<string, any>>({
+const MultiStepForm = <TFormData extends object>({
 	title,
 	subtitle,
 	steps,

@@ -106,7 +106,7 @@ const CourierRatesAdmin = () => {
 
 	const fetchContainerTypes = async () => {
 		try {
-			const response = await containerTypeAPI.getAll();
+			const response = await containerTypeAPI.getAdministrationOptions();
 			setContainerTypes(response);
 		} catch (error) {
 			console.error('Error fetching container types:', error);

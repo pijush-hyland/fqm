@@ -118,7 +118,7 @@ class QuoteServiceTest {
         ContainerType partialDimensions = validOption(4L);
         partialDimensions.setInternalHeightMeters(null);
         ContainerType invalidTareWeight = validOption(5L);
-        invalidTareWeight.setTareWeightKG(BigDecimal.ZERO);
+        invalidTareWeight.setTareWeightKg(BigDecimal.ZERO);
         ContainerType inconsistentTotalWeight = validOption(6L);
         inconsistentTotalWeight.setMaximumTotalWeightKg(new BigDecimal("28000.00"));
 
@@ -161,7 +161,7 @@ class QuoteServiceTest {
         option.setInternalWidthMeters(new BigDecimal("2.350"));
         option.setInternalHeightMeters(new BigDecimal("2.392"));
         option.setCapacityCbm(new BigDecimal("33.00"));
-        option.setTareWeightKG(new BigDecimal("2230.00"));
+        option.setTareWeightKg(new BigDecimal("2230.00"));
         option.setMaximumCargoWeightKg(new BigDecimal("28230.00"));
         option.setMaximumTotalWeightKg(new BigDecimal("30460.00"));
         return option;

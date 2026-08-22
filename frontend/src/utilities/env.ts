@@ -25,7 +25,7 @@ export const isDevelopment = () => env.NODE_ENV === 'development';
 export const isProduction = () => env.NODE_ENV === 'production';
 
 // Debug logger that only works in development
-export const debugLog = (...args: any[]) => {
+export const debugLog = (...args: unknown[]) => {
   if (env.ENABLE_DEBUG && isDevelopment()) {
     console.log('[DEBUG]', ...args);
   }

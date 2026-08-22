@@ -36,33 +36,9 @@ public class ContainerType {
     @Column(nullable = false)
     private String description;
     
-    @Positive(message = "Length must be positive")
-    @Column(precision = 8, scale = 3)
-    private BigDecimal lengthMeters;
-    
-    @Positive(message = "Width must be positive")
-    @Column(precision = 8, scale = 3)
-    private BigDecimal widthMeters;
-    
-    @Positive(message = "Height must be positive")
-    @Column(precision = 8, scale = 3)
-    private BigDecimal heightMeters;
-    
-    @Positive(message = "Volume must be positive")
-    @Column(precision = 10, scale = 2)
-    private BigDecimal volumeCBM; // Cubic Meters
-    
-    @Positive(message = "Max gross weight must be positive")
-    @Column(name = "max_gross_weight_kg", precision = 10, scale = 2)
-    private BigDecimal maxGrossWeightKG;
-    
     @Positive(message = "Tare weight must be positive")
     @Column(name = "tare_weight_kg", precision = 10, scale = 2)
-    private BigDecimal tareWeightKG;
-    
-    @Positive(message = "Payload must be positive")
-    @Column(name = "max_payload_kg", precision = 10, scale = 2)
-    private BigDecimal maxPayloadKG;
+    private BigDecimal tareWeightKg;
     
     @Column(name = "is_active")
     private Boolean isActive = true;

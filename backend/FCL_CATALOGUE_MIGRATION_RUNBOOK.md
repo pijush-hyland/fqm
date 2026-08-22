@@ -29,7 +29,7 @@ Never baseline manually at version `1` or later. Doing so skips required catalog
 3. Review and retain the `FCL catalogue preflight` report. It must list canonical matches, required inserts, known and custom retirements, reference counts, and no blocking conflicts.
 4. Resolve every conflict before deployment. Do not bypass or repair Flyway history.
 5. Start the application normally. The transactional data migration repeats preflight checks before mutation and runs postflight assertions before commit.
-6. Confirm Flyway versions `0` through `3` are successful and the postflight log reports six active canonical options.
+6. Confirm Flyway versions `0` through `4` are successful and the postflight log reports six active canonical options. Version `4` removes the obsolete calculated measurement columns.
 7. Restart once and confirm Flyway reports no pending migrations.
 
 ## Recovery

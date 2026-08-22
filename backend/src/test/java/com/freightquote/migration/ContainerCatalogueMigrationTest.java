@@ -91,7 +91,7 @@ class ContainerCatalogueMigrationTest {
     void migratesRepresentativeExistingDatabaseWithoutChangingHistoricalReferences() throws SQLException {
         Flyway flyway = flyway();
 
-        assertThat(flyway.migrate().migrationsExecuted).isEqualTo(3);
+        assertThat(flyway.migrate().migrationsExecuted).isEqualTo(4);
 
         try (Connection connection = connection(); Statement statement = connection.createStatement()) {
             assertThat(readActiveOptions(statement)).containsExactly(
@@ -120,11 +120,12 @@ class ContainerCatalogueMigrationTest {
                     """))
                     .isEqualTo("2");
             assertThat(readSingle(statement, """
-                    SELECT CONCAT(length_meters, '|', width_meters, '|', height_meters, '|', volumecbm,
-                        '|', max_gross_weight_kg, '|', max_payload_kg)
-                    FROM container_types WHERE code = '20TK'
+                    SELECT COUNT(*) FROM information_schema.columns
+                    WHERE table_schema = DATABASE() AND table_name = 'container_types'
+                        AND column_name IN ('length_meters', 'width_meters', 'height_meters',
+                            'volumecbm', 'max_gross_weight_kg', 'max_payload_kg')
                     """))
-                    .isNull();
+                    .isEqualTo("0");
                     assertThatThrownBy(() -> statement.execute("""
                         UPDATE container_types
                         SET internal_length_meters = NULL
@@ -243,7 +244,7 @@ class ContainerCatalogueMigrationTest {
             statement.execute("DROP TABLE IF EXISTS lcl_freight_rates");
         }
 
-        assertThat(flyway().migrate().migrationsExecuted).isEqualTo(4);
+        assertThat(flyway().migrate().migrationsExecuted).isEqualTo(5);
 
         try (Connection connection = connection(); Statement statement = connection.createStatement()) {
             assertThat(readSingle(statement, "SELECT COUNT(*) FROM container_types WHERE is_active = 1"))

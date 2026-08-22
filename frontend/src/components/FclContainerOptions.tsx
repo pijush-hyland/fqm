@@ -33,6 +33,7 @@ const isValidOption = (option: CustomerContainerOption): option is ValidCustomer
 	&& option.name.trim().length > 0
 	&& isPositiveNumber(option.capacityCbm)
 	&& isPositiveNumber(option.maximumCargoWeightKg)
+	&& option.active !== false
 	&& hasValidDimensions(option.internalDimensionsMeters);
 
 const formatMeasurement = (value: number, maximumFractionDigits: number, locale?: string) =>
@@ -45,11 +46,16 @@ const FclContainerOptions = ({
 	locale,
 	compact = false,
 }: FclContainerOptionsProps) => {
+	const visibleOptions = options.filter((option) => option.active !== false);
+
 	useEffect(() => {
 		if (options.length === 0) {
 			return;
 		}
-		const validIds = new Set(options.filter(isValidOption).map((option) => option.id));
+		const validIds = new Set(options
+			.filter((option) => option.active !== false)
+			.filter(isValidOption)
+			.map((option) => option.id));
 		for (const [optionId, quantity] of Object.entries(quantities)) {
 			const numericId = Number(optionId);
 			if (quantity > 0 && !validIds.has(numericId)) {
@@ -58,7 +64,7 @@ const FclContainerOptions = ({
 		}
 	}, [onQuantityChange, options, quantities]);
 
-	const selectedOptions = options
+	const selectedOptions = visibleOptions
 		.filter(isValidOption)
 		.filter((option) => (quantities[option.id] ?? 0) > 0);
 	const totalContainers = selectedOptions.reduce((sum, option) => sum + quantities[option.id], 0);
@@ -70,7 +76,7 @@ const FclContainerOptions = ({
 	return (
 		<>
 			<div className={compact ? 'grid grid-cols-1 gap-3' : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'}>
-				{options.map((option) => {
+				{visibleOptions.map((option) => {
 					const validOption = isValidOption(option) ? option : null;
 					const valid = validOption !== null;
 					const quantity = quantities[option.id] ?? 0;
@@ -94,7 +100,7 @@ const FclContainerOptions = ({
 												? 'Not available'
 												: `${formatMeasurement(validOption.internalDimensionsMeters.length, 3, locale)} × ${formatMeasurement(validOption.internalDimensionsMeters.width, 3, locale)} × ${formatMeasurement(validOption.internalDimensionsMeters.height, 3, locale)} m`}
 										</p>
-										<p>Capacity: {formatMeasurement(validOption.capacityCbm, 2, locale)} m³</p>
+										<p>Container Capacity: {formatMeasurement(validOption.capacityCbm, 2, locale)} m³</p>
 										<p>Maximum cargo weight: {formatMeasurement(validOption.maximumCargoWeightKg, 0, locale)} kg</p>
 									</div>
 								) : (

@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -82,6 +84,26 @@ class AdministrationContainerCatalogueHttpTest {
         for (JsonNode option : options) {
             assertThat(iteratorToList(option.fieldNames())).containsExactlyInAnyOrderElementsOf(allowedFields);
         }
+    }
+
+    @Test
+    void doesNotExposeLegacyEntityLookupsOrCatalogueMutations() {
+        String baseUrl = "http://localhost:" + port + "/container-types";
+
+        assertUnavailable(restTemplate.getForEntity(baseUrl + "/1", String.class));
+        assertUnavailable(restTemplate.getForEntity(baseUrl + "/code/20GP", String.class));
+        assertUnavailable(restTemplate.getForEntity(baseUrl + "/suitable", String.class));
+        assertUnavailable(restTemplate.postForEntity(baseUrl + "/volume-weight", null, String.class));
+        assertUnavailable(restTemplate.postForEntity(baseUrl + "/chargeable-weight", null, String.class));
+        assertUnavailable(restTemplate.postForEntity(baseUrl, "{}", String.class));
+        assertUnavailable(restTemplate.exchange(
+                baseUrl + "/9223372036854775807", HttpMethod.PUT, new HttpEntity<>("{}"), String.class));
+        assertUnavailable(restTemplate.exchange(
+                baseUrl + "/9223372036854775807", HttpMethod.DELETE, HttpEntity.EMPTY, String.class));
+    }
+
+    private static void assertUnavailable(ResponseEntity<?> response) {
+        assertThat(response.getStatusCode()).isIn(HttpStatus.NOT_FOUND, HttpStatus.METHOD_NOT_ALLOWED);
     }
 
     private static JsonNode findByCode(JsonNode options, String code) {

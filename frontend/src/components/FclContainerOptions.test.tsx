@@ -53,16 +53,16 @@ test('renders authoritative metric details and explicit unavailable states', () 
   const standard = screen.getByRole('group', { name: '20 Standard' });
   expect(Array.from(standard.querySelectorAll('p')).map((row) => row.textContent)).toEqual([
     'Internal dimensions: 5.895 × 2.35 × 2.392 m',
-    'Capacity: 33 m³',
+    'Container Capacity: 33 m³',
     'Maximum cargo weight: 28,230 kg',
   ]);
   expect(standard).toHaveTextContent('Internal dimensions: 5.895 × 2.35 × 2.392 m');
-  expect(standard).toHaveTextContent('Capacity: 33 m³');
+  expect(standard).toHaveTextContent('Container Capacity: 33 m³');
   expect(standard).toHaveTextContent('Maximum cargo weight: 28,230 kg');
 
   const openTop = screen.getByRole('group', { name: '20 Open Top' });
   expect(openTop).toHaveTextContent('Internal dimensions: Not available');
-  expect(openTop).toHaveTextContent('Capacity: 62.5 m³');
+  expect(openTop).toHaveTextContent('Container Capacity: 62.5 m³');
   expect(openTop).toHaveTextContent('Maximum cargo weight: 27,320 kg');
 
   const invalid = screen.getByRole('group', { name: 'Unexpected option' });
@@ -105,7 +105,7 @@ test('changes valid quantities and reports Combined Capacity from source capacit
     />,
   );
   expect(screen.getByText('Combined Capacity (calculated): 95.5 m³')).toBeInTheDocument();
-  expect(screen.getByRole('group', { name: '20 Standard' })).toHaveTextContent('Capacity: 33 m³');
+  expect(screen.getByRole('group', { name: '20 Standard' })).toHaveTextContent('Container Capacity: 33 m³');
 });
 
 test('clears a preselected invalid option while keeping its controls disabled', () => {

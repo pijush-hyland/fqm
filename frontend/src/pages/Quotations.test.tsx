@@ -33,12 +33,12 @@ const options: CustomerContainerOption[] = [
 ];
 
 const expectedDetails = [
-  ['Internal dimensions: 5.895 × 2.35 × 2.392 m', 'Capacity: 33 m³', 'Maximum cargo weight: 28,230 kg'],
-  ['Internal dimensions: 12.029 × 2.35 × 2.392 m', 'Capacity: 60 m³', 'Maximum cargo weight: 27,000 kg'],
-  ['Internal dimensions: Not available', 'Capacity: 33 m³', 'Maximum cargo weight: 27,320 kg'],
-  ['Internal dimensions: 12.024 × 2.35 × 2.697 m', 'Capacity: 67 m³', 'Maximum cargo weight: 27,000 kg'],
-  ['Internal dimensions: Not available', 'Capacity: 62.5 m³', 'Maximum cargo weight: 28,500 kg'],
-  ['Internal dimensions: Not available', 'Capacity: 24 m³', 'Maximum cargo weight: 32,200 kg'],
+  ['Internal dimensions: 5.895 × 2.35 × 2.392 m', 'Container Capacity: 33 m³', 'Maximum cargo weight: 28,230 kg'],
+  ['Internal dimensions: 12.029 × 2.35 × 2.392 m', 'Container Capacity: 60 m³', 'Maximum cargo weight: 27,000 kg'],
+  ['Internal dimensions: Not available', 'Container Capacity: 33 m³', 'Maximum cargo weight: 27,320 kg'],
+  ['Internal dimensions: 12.024 × 2.35 × 2.697 m', 'Container Capacity: 67 m³', 'Maximum cargo weight: 27,000 kg'],
+  ['Internal dimensions: Not available', 'Container Capacity: 62.5 m³', 'Maximum cargo weight: 28,500 kg'],
+  ['Internal dimensions: Not available', 'Container Capacity: 24 m³', 'Maximum cargo weight: 32,200 kg'],
 ];
 
 beforeEach(() => {

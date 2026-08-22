@@ -68,11 +68,17 @@ const LocationsAdmin = () => {
 		}
 	};
 
-	const handleFilterChange = (field: keyof LocationFilters, value: any) => {
+	const handleFilterChange = <Field extends keyof LocationFilters>(
+		field: Field,
+		value: LocationFilters[Field],
+	) => {
 		setFilters(prev => ({ ...prev, [field]: value }));
 	};
 
-	const handleFormChange = (field: keyof LocationFormData, value: any) => {
+	const handleFormChange = <Field extends keyof LocationFormData>(
+		field: Field,
+		value: LocationFormData[Field],
+	) => {
 		setFormData(prev => ({ ...prev, [field]: value }));
 	};
 
@@ -226,7 +232,7 @@ const LocationsAdmin = () => {
 						<label className="block text-xs font-medium text-gray-700 mb-2">Type</label>
 						<select
 							value={filters.type}
-							onChange={(e) => handleFilterChange('type', e.target.value)}
+							onChange={(e) => handleFilterChange('type', e.target.value as LocationType | '')}
 							className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors border-gray-300"
 						>
 							<option value="">All Types</option>
@@ -400,7 +406,7 @@ const LocationsAdmin = () => {
 										<select
 											required
 											value={formData.type}
-											onChange={(e) => handleFormChange('type', e.target.value)}
+											onChange={(e) => handleFormChange('type', e.target.value as LocationType)}
 											className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 										>
 											<option value="AIRPORT">Airport</option>

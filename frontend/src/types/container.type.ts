@@ -26,4 +26,5 @@ export type CustomerContainerOption = {
     internalDimensionsMeters: InternalDimensionsMeters | null;
     capacityCbm: number | null;
     maximumCargoWeightKg: number | null;
+    active?: boolean;
 };

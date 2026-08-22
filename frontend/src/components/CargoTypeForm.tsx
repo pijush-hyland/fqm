@@ -53,7 +53,7 @@ export const cargoTypeCategories = {
 	]
 };
 
-interface CargoTypeFormProps extends StepComponentProps<QuoteFormData> { }
+type CargoTypeFormProps = StepComponentProps<QuoteFormData>;
 
 const CargoTypeForm: React.FC<CargoTypeFormProps> = ({
 	formData,
