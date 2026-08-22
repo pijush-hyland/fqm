@@ -1,10 +1,11 @@
-import type { ContainerType } from "../types/container.type";
+import type { ContainerType, CustomerContainerOption } from "../types/container.type";
 import { api } from "./api";
 
 const CONTAINER_TYPE_BASE_URL = '/container-types';
 
 export const CONTAINER_TYPE_URL = {
     getAll: `${CONTAINER_TYPE_BASE_URL}`,
+    getCustomerOptions: `${CONTAINER_TYPE_BASE_URL}/customer`,
     getById: `${CONTAINER_TYPE_BASE_URL}/types/:id`,
     getByCode: `${CONTAINER_TYPE_BASE_URL}/code/:code`,
     getSuitableContainerTypes: `${CONTAINER_TYPE_BASE_URL}/suitable`,
@@ -17,6 +18,7 @@ export const CONTAINER_TYPE_URL = {
 
 const containerTypeAPI = {
     getAll: () => api.get(CONTAINER_TYPE_URL.getAll),
+    getCustomerOptions: () => api.get<CustomerContainerOption[]>(CONTAINER_TYPE_URL.getCustomerOptions),
     getById: (id: string) => api.get(CONTAINER_TYPE_URL.getById.replace(":id", id)),
     getByCode: (code: string) => api.get(CONTAINER_TYPE_URL.getByCode.replace(":code", code)),
     getSuitableContainerTypes: (weightKG: number, volumeCBM: number) =>

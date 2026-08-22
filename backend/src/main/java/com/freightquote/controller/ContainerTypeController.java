@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.freightquote.dto.CustomerContainerOptionDto;
 import com.freightquote.entity.ContainerType;
 import com.freightquote.service.ContainerTypeService;
 
@@ -28,14 +29,22 @@ public class ContainerTypeController {
     @Autowired
     private ContainerTypeService containerTypeService;
     
+    @GetMapping("/customer")
+    public ResponseEntity<List<CustomerContainerOptionDto>> getCustomerContainerOptions() {
+        try {
+            return ResponseEntity.ok(containerTypeService.getCustomerContainerOptions());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
     @GetMapping
     public ResponseEntity<List<ContainerType>> getAllContainerTypes(
             @RequestParam(required = false) String search,
             @RequestParam(required = false, defaultValue = "false") boolean activeOnly) {
-        
         try {
             List<ContainerType> containerTypes;
-            
+
             if (search != null && !search.trim().isEmpty()) {
                 containerTypes = containerTypeService.searchContainerTypes(search);
             } else if (activeOnly) {
@@ -43,7 +52,7 @@ public class ContainerTypeController {
             } else {
                 containerTypes = containerTypeService.getAllContainerTypes();
             }
-            
+
             return ResponseEntity.ok(containerTypes);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();

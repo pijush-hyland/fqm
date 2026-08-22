@@ -16,6 +16,8 @@ public interface ContainerTypeRepository extends JpaRepository<ContainerType, Lo
     Optional<ContainerType> findByCode(String code);
     
     List<ContainerType> findByIsActiveTrue();
+
+    List<ContainerType> findByIsActiveTrueAndCodeInOrderByDisplayOrderAsc(List<String> codes);
     
     @Query("SELECT ct FROM ContainerType ct WHERE " +
            "ct.isActive = true AND " +

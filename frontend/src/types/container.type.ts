@@ -13,3 +13,18 @@ export type ContainerType = {
     isActive: boolean;
     isRefrigerated: boolean;
 };
+
+export type InternalDimensionsMeters = {
+    length: number;
+    width: number;
+    height: number;
+};
+
+export type CustomerContainerOption = {
+    id: number;
+    code: string;
+    name: string;
+    internalDimensionsMeters: InternalDimensionsMeters | null;
+    capacityCbm: number | null;
+    maximumCargoWeightKg: number | null;
+};

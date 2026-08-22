@@ -7,11 +7,16 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.freightquote.dto.CustomerContainerOptionDto;
+import com.freightquote.dto.CustomerContainerOptionDto.InternalDimensionsMeters;
 import com.freightquote.entity.ContainerType;
 import com.freightquote.repository.ContainerTypeRepository;
 
 @Service
 public class ContainerTypeService {
+
+    private static final List<String> CUSTOMER_FCL_OPTION_CODES =
+            List.of("20GP", "40GP", "20OT", "40HC", "40OT", "20TK");
     
     @Autowired
     private ContainerTypeRepository containerTypeRepository;
@@ -22,6 +27,13 @@ public class ContainerTypeService {
     
     public List<ContainerType> getActiveContainerTypes() {
         return containerTypeRepository.findByIsActiveTrue();
+    }
+
+    public List<CustomerContainerOptionDto> getCustomerContainerOptions() {
+        return containerTypeRepository
+            .findByIsActiveTrueAndCodeInOrderByDisplayOrderAsc(CUSTOMER_FCL_OPTION_CODES).stream()
+                .map(this::toCustomerOption)
+                .toList();
     }
     
     public List<ContainerType> getActiveContainerTypesOrderedByCbm() {
@@ -62,6 +74,26 @@ public class ContainerTypeService {
     
     public boolean existsByCode(String code) {
         return containerTypeRepository.existsByCode(code);
+    }
+
+    private CustomerContainerOptionDto toCustomerOption(ContainerType containerType) {
+        InternalDimensionsMeters dimensions = null;
+        if (containerType.getInternalLengthMeters() != null
+                && containerType.getInternalWidthMeters() != null
+                && containerType.getInternalHeightMeters() != null) {
+            dimensions = new InternalDimensionsMeters(
+                    containerType.getInternalLengthMeters(),
+                    containerType.getInternalWidthMeters(),
+                    containerType.getInternalHeightMeters());
+        }
+
+        return new CustomerContainerOptionDto(
+                containerType.getId(),
+                containerType.getCode(),
+                containerType.getName(),
+                dimensions,
+                containerType.getCapacityCbm(),
+                containerType.getMaximumCargoWeightKg());
     }
     
     public Double calculateVolumeWeight(Double volumeCBM, Double volumetricFactor) {
