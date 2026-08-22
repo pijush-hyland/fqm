@@ -37,31 +37,31 @@ public class ContainerType {
     private String description;
     
     @Positive(message = "Length must be positive")
-    @Column(nullable = false, precision = 5, scale = 2)
+    @Column(precision = 8, scale = 3)
     private BigDecimal lengthMeters;
     
     @Positive(message = "Width must be positive")
-    @Column(nullable = false, precision = 5, scale = 2)
+    @Column(precision = 8, scale = 3)
     private BigDecimal widthMeters;
     
     @Positive(message = "Height must be positive")
-    @Column(nullable = false, precision = 5, scale = 2)
+    @Column(precision = 8, scale = 3)
     private BigDecimal heightMeters;
     
     @Positive(message = "Volume must be positive")
-    @Column(nullable = false, precision = 8, scale = 3)
+    @Column(precision = 10, scale = 2)
     private BigDecimal volumeCBM; // Cubic Meters
     
     @Positive(message = "Max gross weight must be positive")
-    @Column(name = "max_gross_weight_kg", nullable = false, precision = 8, scale = 2)
+    @Column(name = "max_gross_weight_kg", precision = 10, scale = 2)
     private BigDecimal maxGrossWeightKG;
     
     @Positive(message = "Tare weight must be positive")
-    @Column(name = "tare_weight_kg", nullable = false, precision = 8, scale = 2)
+    @Column(name = "tare_weight_kg", precision = 10, scale = 2)
     private BigDecimal tareWeightKG;
     
     @Positive(message = "Payload must be positive")
-    @Column(name = "max_payload_kg", nullable = false, precision = 8, scale = 2)
+    @Column(name = "max_payload_kg", precision = 10, scale = 2)
     private BigDecimal maxPayloadKG;
     
     @Column(name = "is_active")
@@ -69,6 +69,33 @@ public class ContainerType {
     
     @Column(name = "is_refrigerated")
     private Boolean isRefrigerated = false;
+
+    @Positive(message = "Internal length must be positive")
+    @Column(name = "internal_length_meters", precision = 8, scale = 3)
+    private BigDecimal internalLengthMeters;
+
+    @Positive(message = "Internal width must be positive")
+    @Column(name = "internal_width_meters", precision = 8, scale = 3)
+    private BigDecimal internalWidthMeters;
+
+    @Positive(message = "Internal height must be positive")
+    @Column(name = "internal_height_meters", precision = 8, scale = 3)
+    private BigDecimal internalHeightMeters;
+
+    @Positive(message = "Container capacity must be positive")
+    @Column(name = "capacity_cbm", precision = 10, scale = 2)
+    private BigDecimal capacityCbm;
+
+    @Positive(message = "Maximum cargo weight must be positive")
+    @Column(name = "maximum_cargo_weight_kg", precision = 10, scale = 2)
+    private BigDecimal maximumCargoWeightKg;
+
+    @Positive(message = "Maximum total weight must be positive")
+    @Column(name = "maximum_total_weight_kg", precision = 10, scale = 2)
+    private BigDecimal maximumTotalWeightKg;
+
+    @Column(name = "display_order", unique = true)
+    private Integer displayOrder;
 
     public ContainerType(Long id) {
         this.id = id;

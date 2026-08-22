@@ -1,6 +1,5 @@
 package com.freightquote.service;
 
-import java.math.BigDecimal;
 import java.util.Arrays;
 import java.util.List;
 
@@ -8,9 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import com.freightquote.entity.ContainerType;
 import com.freightquote.entity.Location;
-import com.freightquote.repository.ContainerTypeRepository;
 import com.freightquote.repository.LocationRepository;
 
 @Component
@@ -19,13 +16,9 @@ public class DataInitializationService implements CommandLineRunner {
     @Autowired
     private LocationRepository locationRepository;
     
-    @Autowired
-    private ContainerTypeRepository containerTypeRepository;
-    
     @Override
     public void run(String... args) throws Exception {
         initializeLocations();
-        initializeContainerTypes();
     }
     
     private void initializeLocations() {
@@ -155,78 +148,6 @@ public class DataInitializationService implements CommandLineRunner {
         System.out.println("Initialized " + locations.size() + " locations");
     }
     
-    private void initializeContainerTypes() {
-        // Check if container types already exist
-        if (containerTypeRepository.count() > 0) {
-            return; // Data already initialized
-        }
-        
-        List<ContainerType> containerTypes = Arrays.asList(
-            // Standard 20ft containers
-            createContainerType("20GP", "20ft General Purpose", 
-                "Standard 20-foot dry container for general cargo",
-                new BigDecimal("5.90"), new BigDecimal("2.35"), new BigDecimal("2.39"),
-                new BigDecimal("30480"), new BigDecimal("2230"), false),
-                
-            createContainerType("20HC", "20ft High Cube", 
-                "20-foot high cube container with extra height",
-                new BigDecimal("5.90"), new BigDecimal("2.35"), new BigDecimal("2.69"),
-                new BigDecimal("30480"), new BigDecimal("2230"), false),
-                
-            // Standard 40ft containers
-            createContainerType("40GP", "40ft General Purpose", 
-                "Standard 40-foot dry container for general cargo",
-                new BigDecimal("12.03"), new BigDecimal("2.35"), new BigDecimal("2.39"),
-                new BigDecimal("30480"), new BigDecimal("3740"), false),
-                
-            createContainerType("40HC", "40ft High Cube", 
-                "40-foot high cube container with extra height",
-                new BigDecimal("12.03"), new BigDecimal("2.35"), new BigDecimal("2.69"),
-                new BigDecimal("30480"), new BigDecimal("3740"), false),
-                
-            // Refrigerated containers
-            createContainerType("20RF", "20ft Refrigerated", 
-                "20-foot refrigerated container for temperature-controlled cargo",
-                new BigDecimal("5.44"), new BigDecimal("2.29"), new BigDecimal("2.27"),
-                new BigDecimal("30480"), new BigDecimal("3080"), true),
-                
-            createContainerType("40RF", "40ft Refrigerated", 
-                "40-foot refrigerated container for temperature-controlled cargo",
-                new BigDecimal("11.56"), new BigDecimal("2.29"), new BigDecimal("2.27"),
-                new BigDecimal("30480"), new BigDecimal("4800"), true),
-                
-            createContainerType("40RH", "40ft Refrigerated High Cube", 
-                "40-foot refrigerated high cube container",
-                new BigDecimal("11.56"), new BigDecimal("2.29"), new BigDecimal("2.57"),
-                new BigDecimal("30480"), new BigDecimal("4800"), true),
-                
-            // Open Top containers
-            createContainerType("20OT", "20ft Open Top", 
-                "20-foot open top container for oversized cargo",
-                new BigDecimal("5.90"), new BigDecimal("2.35"), new BigDecimal("2.39"),
-                new BigDecimal("30480"), new BigDecimal("2300"), false),
-                
-            createContainerType("40OT", "40ft Open Top", 
-                "40-foot open top container for oversized cargo",
-                new BigDecimal("12.03"), new BigDecimal("2.35"), new BigDecimal("2.39"),
-                new BigDecimal("30480"), new BigDecimal("3900"), false),
-                
-            // Flat Rack containers
-            createContainerType("20FR", "20ft Flat Rack", 
-                "20-foot flat rack container for heavy or oversized cargo",
-                new BigDecimal("5.90"), new BigDecimal("2.35"), new BigDecimal("2.39"),
-                new BigDecimal("45000"), new BigDecimal("2360"), false),
-                
-            createContainerType("40FR", "40ft Flat Rack", 
-                "40-foot flat rack container for heavy or oversized cargo",
-                new BigDecimal("12.03"), new BigDecimal("2.35"), new BigDecimal("2.39"),
-                new BigDecimal("45000"), new BigDecimal("5000"), false)
-        );
-        
-        containerTypeRepository.saveAll(containerTypes);
-        System.out.println("Initialized " + containerTypes.size() + " container types");
-    }
-    
     private Location createLocation(String Code, String name, String country, String countryCode, 
                                   String portCode, Location.Type locationType) {
         Location location = new Location();
@@ -237,30 +158,5 @@ public class DataInitializationService implements CommandLineRunner {
         location.setType(locationType);
         location.setIsActive(true);
         return location;
-    }
-    
-    private ContainerType createContainerType(String code, String name, String description,
-                                            BigDecimal length, BigDecimal width, BigDecimal height,
-                                            BigDecimal maxGrossWeight, BigDecimal tareWeight, boolean isRefrigerated) {
-        ContainerType containerType = new ContainerType();
-        containerType.setCode(code);
-        containerType.setName(name);
-        containerType.setDescription(description);
-        containerType.setLengthMeters(length);
-        containerType.setWidthMeters(width);
-        containerType.setHeightMeters(height);
-        containerType.setMaxGrossWeightKG(maxGrossWeight);
-        containerType.setTareWeightKG(tareWeight);
-        containerType.setIsRefrigerated(isRefrigerated);
-        containerType.setIsActive(true);
-        
-        // Calculate derived values
-        BigDecimal volumeCBM = length.multiply(width).multiply(height);
-        containerType.setVolumeCBM(volumeCBM);
-        
-        BigDecimal maxPayload = maxGrossWeight.subtract(tareWeight);
-        containerType.setMaxPayloadKG(maxPayload);
-        
-        return containerType;
     }
 }
