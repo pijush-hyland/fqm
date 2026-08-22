@@ -1,7 +1,11 @@
 package com.freightquote.exception;
 
+import java.time.LocalDateTime;
+import java.util.List;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -10,11 +14,75 @@ import org.springframework.web.context.request.WebRequest;
 
 import com.freightquote.dto.DuplicateRateErrorDto;
 import com.freightquote.dto.ErrorResponseDto;
+import com.freightquote.dto.InvalidContainerSelectionErrorDto;
+import com.fasterxml.jackson.databind.exc.InvalidFormatException;
 
 import jakarta.validation.ConstraintViolationException;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+
+    private static final String INVALID_CONTAINER_SELECTION = "INVALID_CONTAINER_SELECTION";
+
+    @ExceptionHandler(InvalidContainerSelectionException.class)
+    public ResponseEntity<InvalidContainerSelectionErrorDto> handleInvalidContainerSelection(
+            InvalidContainerSelectionException ex, WebRequest request) {
+        InvalidContainerSelectionErrorDto errorResponse = new InvalidContainerSelectionErrorDto(
+                HttpStatus.BAD_REQUEST.value(),
+                INVALID_CONTAINER_SELECTION,
+                ex.getMessage(),
+                ex.getContainerIds(),
+                request.getDescription(false).replace("uri=", ""),
+                LocalDateTime.now());
+
+        return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<?> handleUnreadableRequest(
+            HttpMessageNotReadableException ex, WebRequest request) {
+        InvalidFormatException invalidFormat = findCause(ex, InvalidFormatException.class);
+        if (invalidFormat == null || invalidFormat.getPath().stream()
+            .noneMatch(reference -> "containerCount".equals(reference.getFieldName()))) {
+            ErrorResponseDto errorResponse = new ErrorResponseDto(
+                    HttpStatus.BAD_REQUEST.value(),
+                    "Bad Request",
+                    "Request body is malformed",
+                    request.getDescription(false).replace("uri=", ""));
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+
+        InvalidContainerSelectionErrorDto errorResponse = new InvalidContainerSelectionErrorDto(
+                HttpStatus.BAD_REQUEST.value(),
+                INVALID_CONTAINER_SELECTION,
+                "Invalid FCL Container Option selection",
+                List.of(offendingContainerId(invalidFormat)),
+                request.getDescription(false).replace("uri=", ""),
+                LocalDateTime.now());
+        return ResponseEntity.badRequest().body(errorResponse);
+    }
+
+    private String offendingContainerId(InvalidFormatException invalidFormat) {
+        String nestedMapKey = null;
+        for (com.fasterxml.jackson.databind.JsonMappingException.Reference reference : invalidFormat.getPath()) {
+            String fieldName = reference.getFieldName();
+            if (fieldName != null && !"containerCount".equals(fieldName)) {
+                nestedMapKey = fieldName;
+            }
+        }
+        return nestedMapKey != null ? nestedMapKey : String.valueOf(invalidFormat.getValue());
+    }
+
+    private <T extends Throwable> T findCause(Throwable throwable, Class<T> causeType) {
+        Throwable current = throwable;
+        while (current != null) {
+            if (causeType.isInstance(current)) {
+                return causeType.cast(current);
+            }
+            current = current.getCause();
+        }
+        return null;
+    }
     
     /**
      * Handle DuplicateRateException (specific business logic for rate conflicts)

@@ -14,6 +14,8 @@ import com.freightquote.entity.ContainerType;
 public interface ContainerTypeRepository extends JpaRepository<ContainerType, Long> {
     
     Optional<ContainerType> findByCode(String code);
+
+    List<ContainerType> findByIdIn(List<Long> ids);
     
     List<ContainerType> findByIsActiveTrue();
 

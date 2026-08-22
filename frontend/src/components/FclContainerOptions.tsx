@@ -6,6 +6,7 @@ type FclContainerOptionsProps = {
 	quantities: Record<number, number>;
 	onQuantityChange: (optionId: number, quantity: number) => void;
 	locale?: string;
+	compact?: boolean;
 };
 
 type ValidCustomerContainerOption = CustomerContainerOption & {
@@ -26,7 +27,9 @@ const hasValidDimensions = (dimensions: InternalDimensionsMeters | null) =>
 const isValidOption = (option: CustomerContainerOption): option is ValidCustomerContainerOption =>
 	Number.isInteger(option.id)
 	&& option.id > 0
+	&& typeof option.code === 'string'
 	&& option.code.trim().length > 0
+	&& typeof option.name === 'string'
 	&& option.name.trim().length > 0
 	&& isPositiveNumber(option.capacityCbm)
 	&& isPositiveNumber(option.maximumCargoWeightKg)
@@ -40,11 +43,17 @@ const FclContainerOptions = ({
 	quantities,
 	onQuantityChange,
 	locale,
+	compact = false,
 }: FclContainerOptionsProps) => {
 	useEffect(() => {
-		for (const option of options) {
-			if (!isValidOption(option) && (quantities[option.id] ?? 0) > 0) {
-				onQuantityChange(option.id, 0);
+		if (options.length === 0) {
+			return;
+		}
+		const validIds = new Set(options.filter(isValidOption).map((option) => option.id));
+		for (const [optionId, quantity] of Object.entries(quantities)) {
+			const numericId = Number(optionId);
+			if (quantity > 0 && !validIds.has(numericId)) {
+				onQuantityChange(numericId, 0);
 			}
 		}
 	}, [onQuantityChange, options, quantities]);
@@ -60,21 +69,24 @@ const FclContainerOptions = ({
 
 	return (
 		<>
-			<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+			<div className={compact ? 'grid grid-cols-1 gap-3' : 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6'}>
 				{options.map((option) => {
 					const validOption = isValidOption(option) ? option : null;
 					const valid = validOption !== null;
 					const quantity = quantities[option.id] ?? 0;
+					const optionName = typeof option.name === 'string' && option.name.trim().length > 0
+						? option.name
+						: 'FCL Container Option';
 
 					return (
 						<section
 							key={option.id}
 							role="group"
-							aria-label={option.name}
+							aria-label={optionName}
 							className="border border-gray-200 rounded-lg p-4 hover:border-gray-300 transition-colors"
 						>
 							<div className="mb-4">
-								<h4 className="font-medium text-gray-900">{option.name}</h4>
+								<h4 className="font-medium text-gray-900">{optionName}</h4>
 								{validOption ? (
 									<div className="mt-2 space-y-1 text-sm text-gray-600">
 										<p>
@@ -97,7 +109,7 @@ const FclContainerOptions = ({
 								<div className="flex items-center space-x-2">
 									<button
 										type="button"
-										aria-label={`Decrease ${option.name} quantity`}
+										aria-label={`Decrease ${optionName} quantity`}
 										disabled={!valid || quantity === 0}
 										onClick={() => onQuantityChange(option.id, Math.max(0, quantity - 1))}
 										className="w-8 h-8 rounded-full border border-gray-300 disabled:opacity-40"
@@ -107,7 +119,7 @@ const FclContainerOptions = ({
 									<input
 										type="number"
 										id={`container-${option.id}`}
-										aria-label={`${option.name} quantity`}
+										aria-label={`${optionName} quantity`}
 										min="0"
 										max="99"
 										disabled={!valid}
@@ -122,7 +134,7 @@ const FclContainerOptions = ({
 									/>
 									<button
 										type="button"
-										aria-label={`Increase ${option.name} quantity`}
+										aria-label={`Increase ${optionName} quantity`}
 										disabled={!valid || quantity >= 99}
 										onClick={() => onQuantityChange(option.id, quantity + 1)}
 										className="w-8 h-8 rounded-full border border-gray-300 disabled:opacity-40"

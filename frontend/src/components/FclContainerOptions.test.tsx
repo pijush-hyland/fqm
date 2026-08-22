@@ -31,6 +31,15 @@ const options: CustomerContainerOption[] = [
   },
 ];
 
+const nullIdentityOption = {
+  id: 100,
+  code: null,
+  name: null,
+  internalDimensionsMeters: null,
+  capacityCbm: 10,
+  maximumCargoWeightKg: 1000,
+} as unknown as CustomerContainerOption;
+
 test('renders authoritative metric details and explicit unavailable states', () => {
   render(
     <FclContainerOptions
@@ -113,4 +122,30 @@ test('clears a preselected invalid option while keeping its controls disabled', 
   expect(onQuantityChange).toHaveBeenCalledWith(99, 0);
   expect(screen.getByLabelText('Unexpected option quantity')).toBeDisabled();
   expect(screen.queryByText(/Combined Capacity/)).not.toBeInTheDocument();
+});
+
+test('renders unavailable state instead of throwing for malformed identity fields', () => {
+  render(
+    <FclContainerOptions
+      options={[nullIdentityOption]}
+      quantities={{}}
+      onQuantityChange={() => undefined}
+    />,
+  );
+
+  expect(screen.getByText('Details unavailable')).toBeInTheDocument();
+  expect(screen.getByLabelText('FCL Container Option quantity')).toBeDisabled();
+});
+
+test('clears selected IDs that are absent from the customer catalogue', () => {
+  const onQuantityChange = vi.fn();
+  render(
+    <FclContainerOptions
+      options={options}
+      quantities={{ 404: 2 }}
+      onQuantityChange={onQuantityChange}
+    />,
+  );
+
+  expect(onQuantityChange).toHaveBeenCalledWith(404, 0);
 });

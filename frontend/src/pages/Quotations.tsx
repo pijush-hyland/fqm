@@ -7,20 +7,22 @@ import type { QuoteRequirement } from '../types/quoteRequirement.type';
 import type { QuoteFormData } from '../types/quoteForm.type';
 import type { courierRate, ShippingType, SeaFreightMode } from '../types/courierRate.type';
 import type { LocationType } from '../types/location.type';
-import type { ContainerType } from '../types/container.type';
+import type { CustomerContainerOption } from '../types/container.type';
 import { cargoTypeCategories } from '../components/CargoTypeForm';
 import containerTypeAPI from '../apis/containerTypeAPI';
+import FclContainerOptions from '../components/FclContainerOptions';
 
 // Filter form data type (excludes fields that are not search filters)
-interface QuotationFilters extends Omit<QuoteFormData, 'maxTransitDays' | 'remarks'> { }
+type QuotationFilters = Omit<QuoteFormData, 'maxTransitDays' | 'remarks'>;
 
 const Quotations = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const [quotations, setQuotations] = useState<courierRate[]>([]);
 	const [loading, setLoading] = useState(false);
+	const [searchError, setSearchError] = useState<string | null>(null);
 	const [showFilters, setShowFilters] = useState(false);
-	const [containerTypes, setContainerTypes] = useState<ContainerType[]>([]);
+	const [containerOptions, setContainerOptions] = useState<CustomerContainerOption[]>([]);
 	const [filters, setFilters] = useState<QuotationFilters>({
 		origin: null,
 		destination: null,
@@ -64,26 +66,33 @@ const Quotations = () => {
 		// Initial API call
 		fetchQuotations(quoteRequirement);
 		// Fetch container types for FCL filtering
-		fetchContainerTypes();
+		fetchContainerOptions();
 	}, [quoteRequirement, navigate]);
 
-	const fetchContainerTypes = async () => {
+	const fetchContainerOptions = async () => {
 		try {
-			const response = await containerTypeAPI.getAll();
-			setContainerTypes(response);
+			const response = await containerTypeAPI.getCustomerOptions();
+			setContainerOptions(response);
 		} catch (error) {
-			console.error('Error fetching container types:', error);
+			console.error('Error fetching FCL Container Options:', error);
 		}
 	};
 
 	const fetchQuotations = async (requirement: QuoteRequirement) => {
 		setLoading(true);
+		setSearchError(null);
 		try {
 			const response = await quoteAPI.getQuoteByRequirement(requirement);
 			setQuotations(response || []);
 		} catch (error) {
 			console.error('Error fetching quotations:', error);
 			setQuotations([]);
+			if (typeof error === 'object' && error !== null && 'code' in error
+					&& error.code === 'INVALID_CONTAINER_SELECTION') {
+				setSearchError('One or more FCL Container Options are no longer valid. Review your selection and search again.');
+			} else {
+				setSearchError('Quotations could not be loaded. Try your search again.');
+			}
 		} finally {
 			setLoading(false);
 		}
@@ -102,7 +111,10 @@ const Quotations = () => {
 		handleFilterChange('containerCount', newContainerCount);
 	};
 
-	const handleFilterChange = (field: keyof QuotationFilters, value: any) => {
+	const handleFilterChange = <Field extends keyof QuotationFilters>(
+		field: Field,
+		value: QuotationFilters[Field],
+	) => {
 		setFilterModified(true);
 		setFilters(prev => ({
 			...prev,
@@ -208,7 +220,10 @@ const Quotations = () => {
 								</label>
 								<select
 									value={filters.shippingType}
-									onChange={(e) => handleFilterChange('shippingType', e.target.value)}
+									onChange={(e) => handleFilterChange(
+										'shippingType',
+										e.target.value as QuotationFilters['shippingType'],
+									)}
 									className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 								>
 									<option value="">Select type</option>
@@ -225,7 +240,10 @@ const Quotations = () => {
 									</label>
 									<select
 										value={filters.seaFreightMode}
-										onChange={(e) => handleFilterChange('seaFreightMode', e.target.value)}
+										onChange={(e) => handleFilterChange(
+											'seaFreightMode',
+											e.target.value as QuotationFilters['seaFreightMode'],
+										)}
 										className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
 									>
 										<option value="">Select mode</option>
@@ -273,58 +291,12 @@ const Quotations = () => {
 									<label className="block text-sm font-medium text-gray-700 mb-3">
 										Container Selection
 									</label>
-									<div className="space-y-3">
-										{containerTypes.map((containerType) => (
-											<div key={containerType.id} className="flex items-center justify-between p-3 border border-gray-200 rounded">
-												<div className="flex-1">
-													<div className="text-sm font-medium text-gray-900">{containerType.name}</div>
-													<div className="text-xs text-gray-500">
-														{containerType.volumeCBM} CBM, {containerType.maxGrossWeightKG}kg max
-													</div>
-												</div>
-												<div className="flex items-center space-x-2">
-													<button
-														type="button"
-														onClick={() => {
-															const numericId = containerType.id;
-															const currentCount = filters.containerCount[numericId] || 0;
-															handleContainerCountChange(containerType.id, Math.max(0, currentCount - 1));
-														}}
-														className="w-6 h-6 rounded border border-gray-300 flex items-center justify-center hover:bg-gray-50 text-sm"
-													>
-														-
-													</button>
-													<input
-														type="number"
-														min="0"
-														max="99"
-														value={(() => {
-															const numericId = containerType.id;
-															return filters.containerCount[numericId] || 0;
-														})()}
-														onChange={(e) => {
-															const count = parseInt(e.target.value, 10);
-															if (!isNaN(count) && count >= 0) {
-																handleContainerCountChange(containerType.id, count);
-															}
-														}}
-														className="w-12 px-1 py-1 text-center border border-gray-300 rounded text-sm"
-													/>
-													<button
-														type="button"
-														onClick={() => {
-															const numericId = containerType.id;
-															const currentCount = filters.containerCount[numericId] || 0;
-															handleContainerCountChange(containerType.id, currentCount + 1);
-														}}
-														className="w-6 h-6 rounded border border-gray-300 flex items-center justify-center hover:bg-gray-50 text-sm"
-													>
-														+
-													</button>
-												</div>
-											</div>
-										))}
-									</div>
+									<FclContainerOptions
+										options={containerOptions}
+										quantities={filters.containerCount}
+										onQuantityChange={handleContainerCountChange}
+										compact
+									/>
 								</div>
 							)}
 
@@ -450,6 +422,10 @@ const Quotations = () => {
 						<div className="bg-white rounded-lg shadow-sm p-8 text-center">
 							<div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
 							<p className="text-gray-600">Loading quotations...</p>
+						</div>
+					) : searchError ? (
+						<div role="alert" className="border border-red-200 bg-red-50 p-4 text-sm text-red-800">
+							{searchError}
 						</div>
 					) : quotations.length === 0 ? (
 						<div className="bg-white rounded-lg shadow-sm p-8 text-center">

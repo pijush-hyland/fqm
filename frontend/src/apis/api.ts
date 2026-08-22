@@ -38,7 +38,17 @@ export const apiRequest = async <T = any>(
     clearTimeout(timeoutId);
 
     if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+      let errorBody: unknown = null;
+      try {
+        errorBody = await response.json();
+      } catch {
+        // The status remains useful when the server does not return JSON.
+      }
+      const code = typeof errorBody === 'object' && errorBody !== null && 'code' in errorBody
+        && typeof errorBody.code === 'string'
+        ? errorBody.code
+        : undefined;
+      throw Object.assign(new Error(`HTTP error! status: ${response.status}`), { code });
     }
 
     // Handle responses that may not have JSON content
