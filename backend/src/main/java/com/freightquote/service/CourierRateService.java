@@ -3,9 +3,12 @@ package com.freightquote.service;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +30,8 @@ import com.freightquote.entity.CourierRate;
 import com.freightquote.entity.FCLFreightRate;
 import com.freightquote.entity.LCLFreightRate;
 import com.freightquote.exception.DuplicateRateException;
+import com.freightquote.exception.InvalidContainerSelectionException;
+import com.freightquote.repository.ContainerTypeRepository;
 import com.freightquote.repository.CourierRateRepository;
 import com.freightquote.specification.CourierRateSpecification;
 
@@ -35,6 +40,9 @@ public class CourierRateService {
 
 	@Autowired
 	private CourierRateRepository courierRateRepository;
+
+	@Autowired
+	private ContainerTypeRepository containerTypeRepository;
 
 	public List<CourierRateDto> getAllRates() {
 		return courierRateRepository.findAll()
@@ -49,6 +57,7 @@ public class CourierRateService {
 	}
 
 	public CourierRateDto createRate(CourierRateDto rateDto) {
+		validateFCLContainerSelection(rateDto, null);
 		// Validate if a similar rate already exists
 		validateRateDoesNotExist(rateDto, null);
 
@@ -195,6 +204,7 @@ public class CourierRateService {
 	public Optional<CourierRateDto> updateRate(Long id, CourierRateDto rateDto) {
 		return courierRateRepository.findById(id)
 			.map(existingRate -> {
+				validateFCLContainerSelection(rateDto, existingRate);
 				// Validate for conflicts before updating - exclude the current rate being updated
 				validateRateDoesNotExist(rateDto, id);
 				
@@ -290,7 +300,6 @@ public class CourierRateService {
 		// Handle multiple container types from DTO's ratesForFCL map
 		if (rateDto.getRatesForFCL() != null && !rateDto.getRatesForFCL().isEmpty()) {
 			
-			// Smart update: Update existing, remove obsolete, add new
 			List<FCLFreightRate> currentRates = existingRate.getFclFreightDetails();
 			Map<Long, FCLFreightRate> currentRatesByContainerType = currentRates.stream()
 					.filter(rate -> rate.getContainerType() != null)
@@ -299,8 +308,10 @@ public class CourierRateService {
 						rate -> rate
 					));
 
-			// Clear the list to rebuild it
-			currentRates.clear();
+			Set<Long> submittedContainerTypeIds = rateDto.getRatesForFCL().keySet();
+			currentRates.removeIf(rate -> rate.getContainerType() != null
+					&& Boolean.TRUE.equals(rate.getContainerType().getIsActive())
+					&& !submittedContainerTypeIds.contains(rate.getContainerType().getId()));
 			
 			// Process each container type from DTO
 			for (Map.Entry<Long, BigDecimal> entry : rateDto.getRatesForFCL().entrySet()) {
@@ -311,15 +322,50 @@ public class CourierRateService {
 				FCLFreightRate existingFclRate = currentRatesByContainerType.get(containerTypeId);
 				
 				if (existingFclRate != null) {
-					// Update existing rate
-					updateExistingFCLRate(existingFclRate, rateDto, newRate);
-					currentRates.add(existingFclRate);
+					if (Boolean.FALSE.equals(existingFclRate.getContainerType().getIsActive())) {
+						if (newRate != null) {
+							existingFclRate.setRate(newRate);
+						}
+					} else {
+						updateExistingFCLRate(existingFclRate, rateDto, newRate);
+					}
 				} else {
 					// Create new rate
 					FCLFreightRate newFclRate = createFCLFreightRateFromDto(rateDto, containerTypeId, newRate);
 					existingRate.addFclRate(newFclRate);
 				}
 			}
+		}
+	}
+
+	private void validateFCLContainerSelection(CourierRateDto rateDto, CourierRate existingRate) {
+		if (rateDto.getShippingType() != ShippingType.WATER
+				|| rateDto.getSeaFreightMode() != SeaFreightMode.FCL
+				|| rateDto.getRatesForFCL() == null) {
+			return;
+		}
+
+		Set<Long> requestedIds = new LinkedHashSet<>(rateDto.getRatesForFCL().keySet());
+		Set<Long> activeIds = containerTypeRepository.findByIdIn(
+				requestedIds.stream().filter(java.util.Objects::nonNull).toList())
+				.stream()
+				.filter(containerType -> Boolean.TRUE.equals(containerType.getIsActive()))
+				.map(ContainerType::getId)
+				.collect(Collectors.toSet());
+		Set<Long> existingIds = new HashSet<>();
+		if (existingRate != null && existingRate.getFclFreightDetails() != null) {
+			existingRate.getFclFreightDetails().stream()
+					.filter(rate -> rate.getContainerType() != null)
+					.map(rate -> rate.getContainerType().getId())
+					.forEach(existingIds::add);
+		}
+
+		List<Long> invalidIds = requestedIds.stream()
+				.filter(containerTypeId -> !activeIds.contains(containerTypeId)
+						&& !existingIds.contains(containerTypeId))
+				.toList();
+		if (!invalidIds.isEmpty()) {
+			throw new InvalidContainerSelectionException(invalidIds);
 		}
 	}
 

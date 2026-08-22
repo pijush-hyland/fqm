@@ -4,7 +4,7 @@ import containerTypeAPI from '../../apis/containerTypeAPI';
 import LocationSelector from '../../components/LocationSelector';
 import { cargoTypeCategories } from '../../components/CargoTypeForm';
 import type { courierRate, ShippingType, SeaFreightMode, CourierRatePayload } from '../../types/courierRate.type';
-import type { ContainerType } from '../../types/container.type';
+import type { AdministrationContainerOption } from '../../types/container.type';
 import NumberInput from '../../common/components/NumberInput';
 
 interface CourierRateFilters {
@@ -54,7 +54,7 @@ const ErrorMessage = ({ error }: { error?: string }) => {
 
 const CourierRatesAdmin = () => {
 	const [rates, setRates] = useState<courierRate[]>([]);
-	const [containerTypes, setContainerTypes] = useState<ContainerType[]>([]);
+	const [containerTypes, setContainerTypes] = useState<AdministrationContainerOption[]>([]);
 	const [loading, setLoading] = useState(false);
 	const [showModal, setShowModal] = useState(false);
 	const [modalMode, setModalMode] = useState<'create' | 'edit'>('create');
@@ -113,11 +113,11 @@ const CourierRatesAdmin = () => {
 		}
 	};
 
-	const handleFilterChange = (field: keyof CourierRateFilters, value: any) => {
+	const handleFilterChange = <K extends keyof CourierRateFilters>(field: K, value: CourierRateFilters[K]) => {
 		setFilters(prev => ({ ...prev, [field]: value }));
 	};
 
-	const handleFormChange = (field: keyof RateFormData, value: any) => {
+	const handleFormChange = <K extends keyof RateFormData>(field: K, value: RateFormData[K]) => {
 		setFormData(prev => ({ ...prev, [field]: value }));
 		if(field === 'shippingType' && value === 'AIR') {
 			// Reset seaFreightMode if shippingType is changed to AIR
@@ -202,12 +202,12 @@ const CourierRatesAdmin = () => {
 				errors.ratesForFCL = 'At least one container type rate is required for FCL shipping';
 			} else {
 				// Validate each rate in ratesForFCL
-				const invalidRates = Object.entries(formData.ratesForFCL).filter(([_, rate]) => !rate || rate <= 0);
+				const invalidRates = Object.entries(formData.ratesForFCL).filter(([, rate]) => !rate || rate <= 0);
 				if (invalidRates.length > 0) {
 					errors.ratesForFCL = 'All container type rates must be greater than 0';
 				}
 				// Check for rates exceeding maximum
-				const excessiveRates = Object.entries(formData.ratesForFCL).filter(([_, rate]) => rate > 999999.99);
+				const excessiveRates = Object.entries(formData.ratesForFCL).filter(([, rate]) => rate > 999999.99);
 				if (excessiveRates.length > 0) {
 					errors.ratesForFCL = 'Container type rates cannot exceed 999,999.99';
 				}
@@ -371,9 +371,16 @@ const CourierRatesAdmin = () => {
 						<div className="space-y-3">
 							{containerTypes.map((containerType) => {
 								const hasRate = formData.ratesForFCL?.[containerType.id];
+								const isRetired = !containerType.active;
+								const hasExistingAssociation = modalMode === 'edit'
+									&& selectedRate?.ratesForFCL != null
+									&& Object.prototype.hasOwnProperty.call(selectedRate.ratesForFCL, containerType.id);
+								const canEditRate = !isRetired || hasExistingAssociation;
 								return (
 									<div 
 										key={containerType.id} 
+										role="group"
+										aria-label={`${containerType.name}${isRetired ? ' Retired' : ''}`}
 										className={`flex items-center space-x-3 p-3 rounded-lg border transition-colors ${
 											hasRate 
 												? 'bg-blue-50 border-blue-200' 
@@ -390,15 +397,21 @@ const CourierRatesAdmin = () => {
 												}`}>
 													{containerType.name}
 												</label>
+												{isRetired && (
+													<span className="text-xs font-semibold text-amber-700 bg-amber-100 px-2 py-0.5 rounded">
+														Retired
+													</span>
+												)}
 											</div>
 											<p className="text-xs text-gray-500 ml-5">
-												{containerType.volumeCBM} CBM capacity, {containerType.maxGrossWeightKG}kg max weight
+												{containerType.capacityCbm ?? 'Not available'} CBM capacity, {containerType.maximumCargoWeightKg ?? 'Not available'} kg maximum cargo weight
 											</p>
 										</div>
 										<div className="flex-shrink-0">
 											<NumberInput
 												placeholder="Enter rate"
 												value={formData.ratesForFCL?.[containerType.id]}
+												disabled={!canEditRate}
 												onChange={(rate) => {
 													const updatedRates = { ...formData.ratesForFCL };
 													if (rate !== undefined && rate > 0) {
@@ -415,7 +428,7 @@ const CourierRatesAdmin = () => {
 												min="0"
 												step="0.01"
 											/>
-											{hasRate && (
+											{hasRate && !isRetired && (
 												<button
 													type="button"
 													onClick={() => {
@@ -453,7 +466,7 @@ const CourierRatesAdmin = () => {
 														key={containerTypeId}
 														className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"
 													>
-														{containerType.name}: {formData.currency} {rate}
+														{containerType.name}{!containerType.active ? ' (Retired)' : ''}: {formData.currency} {rate}
 													</span>
 												) : null;
 											})}
@@ -528,7 +541,7 @@ const CourierRatesAdmin = () => {
 						<label className="block text-sm font-medium text-gray-700 mb-2">Shipping Type</label>
 						<select
 							value={filters.shippingType}
-							onChange={(e) => handleFilterChange('shippingType', e.target.value)}
+							onChange={(e) => handleFilterChange('shippingType', e.target.value as ShippingType | '')}
 							className="w-full px-4 py-3 pr-10 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors border-gray-300 appearance-none bg-white"
 						>
 							<option value="">All</option>
@@ -540,7 +553,7 @@ const CourierRatesAdmin = () => {
 						<label className="block text-sm font-medium text-gray-700 mb-2">Sea Freight Mode</label>
 						<select
 							value={filters.seaFreightMode}
-							onChange={(e) => handleFilterChange('seaFreightMode', e.target.value)}
+							onChange={(e) => handleFilterChange('seaFreightMode', e.target.value as SeaFreightMode | '')}
 							className="w-full px-4 py-3 pr-10 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors border-gray-300 appearance-none bg-white"
 						>
 							<option value="">All</option>
@@ -626,7 +639,7 @@ const CourierRatesAdmin = () => {
 																key={containerTypeId}
 																className="inline-flex items-center px-2 py-1 m-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800"
 															>
-																{containerType.name}: {rate.currency} {rateValue}
+																{containerType.name}{!containerType.active ? ' (Retired)' : ''}: {rate.currency} {rateValue}
 															</span>
 														) : null;
 													})}
@@ -715,11 +728,12 @@ const CourierRatesAdmin = () => {
 								{/* Shipping Type and Mode */}
 								<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
 									<div>
-										<label className="block text-sm font-medium text-gray-700 mb-2">Shipping Type *</label>
+										<label htmlFor="rate-shipping-type" className="block text-sm font-medium text-gray-700 mb-2">Shipping Type *</label>
 										<select
+											id="rate-shipping-type"
 											
 											value={formData.shippingType}
-											onChange={(e) => handleFormChange('shippingType', e.target.value)}
+											onChange={(e) => handleFormChange('shippingType', e.target.value as ShippingType)}
 											className="w-full px-4 py-3 pr-10 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors border-gray-300 appearance-none bg-white"
 										>
 											<option value="AIR">Air Freight</option>
@@ -728,11 +742,12 @@ const CourierRatesAdmin = () => {
 									</div>
 									{formData.shippingType === 'WATER' && (
 										<div>
-											<label className="block text-sm font-medium text-gray-700 mb-2">Sea Freight Mode *</label>
+											<label htmlFor="rate-sea-freight-mode" className="block text-sm font-medium text-gray-700 mb-2">Sea Freight Mode *</label>
 											<select
+												id="rate-sea-freight-mode"
 												
 												value={formData.seaFreightMode}
-												onChange={(e) => handleFormChange('seaFreightMode', e.target.value)}
+												onChange={(e) => handleFormChange('seaFreightMode', e.target.value as SeaFreightMode)}
 												className="w-full px-4 py-3 pr-10 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-colors border-gray-300 appearance-none bg-white"
 											>
 												<option value="LCL">Less Container Load (LCL)</option>

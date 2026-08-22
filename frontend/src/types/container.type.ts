@@ -1,17 +1,16 @@
-export type ContainerType = {
+export type AdministrationContainerOption = {
     id: number;
     code: string;
     name: string;
     description: string;
-    lengthMeters: number;
-    widthMeters: number;
-    heightMeters: number;
-    volumeCBM: number;
-    maxGrossWeightKG: number;
-    tareWeightKG: number;
-    maxPayloadKG: number;
-    isActive: boolean;
-    isRefrigerated: boolean;
+    internalDimensionsMeters: InternalDimensionsMeters | null;
+    capacityCbm: number | null;
+    tareWeightKg: number | null;
+    maximumCargoWeightKg: number | null;
+    maximumTotalWeightKg: number | null;
+    active: boolean;
+    refrigerated: boolean;
+    displayOrder: number | null;
 };
 
 export type InternalDimensionsMeters = {

@@ -7,6 +7,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.freightquote.dto.AdministrationContainerOptionDto;
 import com.freightquote.dto.CustomerContainerOptionDto;
 import com.freightquote.dto.CustomerContainerOptionDto.InternalDimensionsMeters;
 import com.freightquote.entity.ContainerType;
@@ -21,8 +22,16 @@ public class ContainerTypeService {
     @Autowired
     private ContainerTypeRepository containerTypeRepository;
     
-    public List<ContainerType> getAllContainerTypes() {
-        return containerTypeRepository.findAll();
+    public List<AdministrationContainerOptionDto> getAdministrationContainerOptions() {
+        return toAdministrationOptions(containerTypeRepository.findAll());
+    }
+
+    public List<AdministrationContainerOptionDto> getActiveAdministrationContainerOptions() {
+        return toAdministrationOptions(containerTypeRepository.findAllActiveOrderByCbm());
+    }
+
+    public List<AdministrationContainerOptionDto> searchAdministrationContainerOptions(String search) {
+        return toAdministrationOptions(containerTypeRepository.searchContainerTypes(search.trim()));
     }
     
     public List<ContainerType> getActiveContainerTypes() {
@@ -77,6 +86,42 @@ public class ContainerTypeService {
     }
 
     private CustomerContainerOptionDto toCustomerOption(ContainerType containerType) {
+        return new CustomerContainerOptionDto(
+            containerType.getId(),
+            containerType.getCode(),
+            containerType.getName(),
+            internalDimensions(containerType),
+            containerType.getCapacityCbm(),
+            containerType.getMaximumCargoWeightKg());
+        }
+
+        private List<AdministrationContainerOptionDto> toAdministrationOptions(List<ContainerType> containerTypes) {
+        return containerTypes.stream()
+            .map(this::toAdministrationOption)
+            .sorted(java.util.Comparator
+                .comparing(AdministrationContainerOptionDto::displayOrder,
+                    java.util.Comparator.nullsLast(java.util.Comparator.naturalOrder()))
+                .thenComparing(AdministrationContainerOptionDto::code))
+            .toList();
+        }
+
+        private AdministrationContainerOptionDto toAdministrationOption(ContainerType containerType) {
+        return new AdministrationContainerOptionDto(
+            containerType.getId(),
+            containerType.getCode(),
+            containerType.getName(),
+            containerType.getDescription(),
+            internalDimensions(containerType),
+            containerType.getCapacityCbm(),
+            containerType.getTareWeightKG(),
+            containerType.getMaximumCargoWeightKg(),
+            containerType.getMaximumTotalWeightKg(),
+            containerType.getIsActive(),
+            containerType.getIsRefrigerated(),
+            containerType.getDisplayOrder());
+        }
+
+        private InternalDimensionsMeters internalDimensions(ContainerType containerType) {
         InternalDimensionsMeters dimensions = null;
         if (containerType.getInternalLengthMeters() != null
                 && containerType.getInternalWidthMeters() != null
@@ -86,14 +131,7 @@ public class ContainerTypeService {
                     containerType.getInternalWidthMeters(),
                     containerType.getInternalHeightMeters());
         }
-
-        return new CustomerContainerOptionDto(
-                containerType.getId(),
-                containerType.getCode(),
-                containerType.getName(),
-                dimensions,
-                containerType.getCapacityCbm(),
-                containerType.getMaximumCargoWeightKg());
+                return dimensions;
     }
     
     public Double calculateVolumeWeight(Double volumeCBM, Double volumetricFactor) {

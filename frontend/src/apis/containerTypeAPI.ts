@@ -1,4 +1,4 @@
-import type { ContainerType, CustomerContainerOption } from "../types/container.type";
+import type { AdministrationContainerOption, CustomerContainerOption } from "../types/container.type";
 import { api } from "./api";
 
 const CONTAINER_TYPE_BASE_URL = '/container-types';
@@ -17,15 +17,15 @@ export const CONTAINER_TYPE_URL = {
 };
 
 const containerTypeAPI = {
-    getAll: () => api.get(CONTAINER_TYPE_URL.getAll),
+    getAll: () => api.get<AdministrationContainerOption[]>(CONTAINER_TYPE_URL.getAll),
     getCustomerOptions: () => api.get<CustomerContainerOption[]>(CONTAINER_TYPE_URL.getCustomerOptions),
     getById: (id: string) => api.get(CONTAINER_TYPE_URL.getById.replace(":id", id)),
     getByCode: (code: string) => api.get(CONTAINER_TYPE_URL.getByCode.replace(":code", code)),
     getSuitableContainerTypes: (weightKG: number, volumeCBM: number) =>
         api.get(`${CONTAINER_TYPE_URL.getSuitableContainerTypes}?weightKG=${weightKG}&volumeCBM=${volumeCBM}`),
 
-    create: (data: ContainerType) => api.post(CONTAINER_TYPE_URL.create, data),
-    update: (id: string, data: ContainerType) => api.put(CONTAINER_TYPE_URL.update.replace(":id", id), data),
+    create: (data: AdministrationContainerOption) => api.post(CONTAINER_TYPE_URL.create, data),
+    update: (id: string, data: AdministrationContainerOption) => api.put(CONTAINER_TYPE_URL.update.replace(":id", id), data),
     delete: (id: string) => api.delete(CONTAINER_TYPE_URL.delete.replace(":id", id)),
 
     calculateVolumeWeight: (volumeCBM: number, volumetricFactor: number) =>

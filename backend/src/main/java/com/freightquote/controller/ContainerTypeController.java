@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.freightquote.dto.AdministrationContainerOptionDto;
 import com.freightquote.dto.CustomerContainerOptionDto;
 import com.freightquote.entity.ContainerType;
 import com.freightquote.service.ContainerTypeService;
@@ -39,18 +40,18 @@ public class ContainerTypeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<ContainerType>> getAllContainerTypes(
+    public ResponseEntity<List<AdministrationContainerOptionDto>> getAllContainerTypes(
             @RequestParam(required = false) String search,
             @RequestParam(required = false, defaultValue = "false") boolean activeOnly) {
         try {
-            List<ContainerType> containerTypes;
+            List<AdministrationContainerOptionDto> containerTypes;
 
             if (search != null && !search.trim().isEmpty()) {
-                containerTypes = containerTypeService.searchContainerTypes(search);
+                containerTypes = containerTypeService.searchAdministrationContainerOptions(search);
             } else if (activeOnly) {
-                containerTypes = containerTypeService.getActiveContainerTypesOrderedByCbm();
+                containerTypes = containerTypeService.getActiveAdministrationContainerOptions();
             } else {
-                containerTypes = containerTypeService.getAllContainerTypes();
+                containerTypes = containerTypeService.getAdministrationContainerOptions();
             }
 
             return ResponseEntity.ok(containerTypes);
