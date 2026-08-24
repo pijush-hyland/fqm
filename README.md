@@ -19,7 +19,7 @@ Install the following locally:
 
 - Java 17
 - Maven 3
-- Node.js and npm versions compatible with the committed frontend lockfile
+- Node.js 20.19 or later in the 20.x line, 22.12 or later, or 24 and later, plus a compatible npm version
 - MySQL 8
 
 Verify the tools with `java -version`, `mvn --version`, `node --version`, and `npm --version`. Start MySQL and create an empty `freight_quote_db` database before using the default local profile. The default local connection uses MySQL on `localhost:3306`; override its configuration instead of committing credentials.
