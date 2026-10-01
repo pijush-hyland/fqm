@@ -5,6 +5,7 @@ import Home from './pages/Home';
 import { Link } from 'react-router-dom';
 import Quotations from './pages/Quotations';
 import AdminDashboard from './pages/admin/AdminDashBoard';
+import rfqDomainLogo from './assets/rfq-domain-logo.png';
 
 export default function App() {
   console.log("App component rendered");
@@ -64,11 +65,15 @@ function AppContent() {
         {/* Header */}
         <header className="px-6 py-4">
           <div className="max-w-7xl mx-auto flex justify-between items-center">
-            <div>
-              <Link to={"/"} className="text-blue-500/90 hover:text-blue-600 transition-colors font-bold text-2xl cursor-pointer">
-                RFQ
+            <div className="flex items-center gap-2">
+              <Link to={"/"} className="block cursor-pointer" aria-label="RFQ Domain home">
+                <img
+                  src={rfqDomainLogo}
+                  alt="RFQ Domain — Your gateway to global pricing"
+                  className="h-12 w-auto"
+                />
               </Link>
-              {isAdminPage && <Link to="/admin" className="text-gray-500 font-bold ml-2 text-sm align-super">Admin</Link>}
+              {isAdminPage && <Link to="/admin" className="text-gray-500 font-bold text-sm">Admin</Link>}
             </div>
             {!isAdminPage && <nav className="hidden md:flex space-x-8 text-blue-500/70">
               <a href="#" className="hover:text-blue-500 transition-colors">Services</a>
